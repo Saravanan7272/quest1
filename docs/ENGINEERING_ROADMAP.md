@@ -85,8 +85,19 @@ flowchart TD
 4. **Negative Control (`status = "NOT_FOUND"`)**: Cases 6 & 7. Query is absent from both speech and text cards. Pipeline safely returns empty candidate results.
 
 ### Active Modality Scoring in v1.0.0
-- **`scores.asr`**: Computed via $0.70 \cdot \text{partial\_ratio} + 0.30 \cdot \text{token\_coverage}$ ([src/matching.py:L19](file:///e:/quest1/src/matching.py#L19)).
-- **`scores.ocr`**: Computed via $0.60 \cdot \text{ratio} + 0.40 \cdot \text{token\_coverage}$ ([src/matching.py:L47](file:///e:/quest1/src/matching.py#L47)).
+
+- **`scores.asr`**: Computed using a weighted combination of partial phrase similarity and token coverage:
+
+  $$0.70 \cdot \text{partial\_ratio} + 0.30 \cdot \text{token\_coverage}$$
+
+  Implemented in `src/matching.py` (`compute_asr_score`).
+
+- **`scores.ocr`**: Computed using weighted lexical similarity and token coverage:
+
+  $$0.60 \cdot \text{ratio} + 0.40 \cdot \text{token\_coverage}$$
+
+  Implemented in `src/matching.py` (`compute_ocr_score`).
+
 - **`scores.semantic`**: **Interface Extension Point**. The `ModalityScores` dataclass and JSON output schema include `semantic: Optional[float]`, but it returns `null` in v1.0.0 because semantic embeddings are disabled (`semantic.enabled = false` in `config.yaml`).
 
 ---
