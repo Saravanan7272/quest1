@@ -42,12 +42,12 @@
       "ocr_calls": 16,
       "candidates_found": 2,
       "tracked_events": 3,
-      "runtime_seconds": 60.79
+      "runtime_seconds": 1042.21
     }
   },
   "evidence_image_path": "outputs/evaluation/case_05/at_least_tell_me_your_name_001.jpg",
   "evaluation": {
     "passed": true,
-    "reason": "Status matched expected 'FOUND'"
+    "reason": "Status matched 'FOUND'"
   }
 }

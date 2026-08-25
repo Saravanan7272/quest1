@@ -9,21 +9,43 @@
     "asr"
   ],
   "actual_result": {
-    "status": "NOT_FOUND",
-    "results": [],
-    "total_candidates": 0,
+    "status": "FOUND",
+    "results": [
+      {
+        "timestamp": "00:01:43.580",
+        "timestamp_seconds": 103.58,
+        "frame_number": 3107,
+        "extracted_text": "have you quite given up on me?",
+        "match_strength": 0.6524,
+        "match_level": "BELOW_THRESHOLD",
+        "image_path": "outputs/runtime/evidence_103.580s.jpg",
+        "sources": [
+          "asr"
+        ],
+        "evidence": {
+          "speech_match": true,
+          "visual_text_match": false
+        },
+        "scores": {
+          "asr": 0.6524,
+          "ocr": null,
+          "semantic": null
+        }
+      }
+    ],
+    "total_candidates": 1,
     "search_summary": {
-      "scout_frames": 122,
-      "detector_frames": 25,
-      "ocr_calls": 35,
-      "candidates_found": 0,
-      "tracked_events": 22,
-      "runtime_seconds": 441.87
+      "scout_frames": 7,
+      "detector_frames": 4,
+      "ocr_calls": 0,
+      "candidates_found": 1,
+      "tracked_events": 0,
+      "runtime_seconds": 34.42
     }
   },
-  "evidence_image_path": "",
+  "evidence_image_path": "outputs/evaluation/case_04/have_you_quite_given_up_on_me__001.jpg",
   "evaluation": {
-    "passed": false,
-    "reason": "Status mismatch: got 'NOT_FOUND', expected 'FOUND'"
+    "passed": true,
+    "reason": "Status matched 'FOUND'"
   }
 }

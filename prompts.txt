@@ -1,299 +1,294 @@
 ============================================================
 PROMPT 001
 ============================================================
-Tool: Google Antigravity / DeepMind AI Coding Assistant
 Date: 2026-08-25
-Purpose: Architecture Specification & Master Implementation Guidance
 
 Prompt:
-Master Implementation + Submission Instruction defining Query-Guided Temporal Search architecture:
-- Acquisition via yt-dlp & FFprobe
-- Temporal localization via faster-whisper ASR with combined partial phrase ratio (0.70) and token coverage (0.30)
-- Configurable search window padding (5.0s) and coarse 1 FPS frame sampling
-- Visual verification using PaddleOCR / RapidOCR with box-level character similarity (0.60) and token coverage (0.40)
-- Mandatory Phase 0 Environment Gate (hardware inspection, .venv validation, FFmpeg check, isolated model smoke tests)
-- Professional documentation (README.md, APPROACH.md, prompts.txt, evaluation metrics)
+We need to design and implement a Dual-Path Video Dialogue Locator system capable of locating dialogue occurrences in video content from either spoken audio or burned-in visual text. Please execute the following master implementation plan:
 
-Impact:
-Established the initial end-to-end architecture, strict environment validation gate, phaser roadmap, and defensible baseline design for the video dialogue locator project.
+1. System Infrastructure & Acquisition:
+   - Implement video downloading and media ingestion using yt-dlp.
+   - Inspect container video metadata using OpenCV (duration, FPS, resolution, audio presence).
+
+2. Audio Evidence Path (ASR):
+   - Implement speech transcription using faster-whisper with word-level timestamps enabled.
+   - Implement ASR text matching combining fuzzy phrase partial ratio (0.70 weight) and token coverage ratio (0.30 weight).
+   - Configure search window padding (5.0s) and candidate similarity thresholding (0.50).
+
+3. Visual Text Discovery Path (OCR):
+   - Implement frame sampling at coarse frame rates (1.0 FPS).
+   - Integrate PaddleOCR / RapidOCR engine with bounding box detection and text recognition.
+   - Implement box-level character similarity (0.60 weight) and token coverage (0.40 weight) for visual text matching.
+
+4. Phase 0 Environment Gate & Quality Assurance:
+   - Perform hardware inspection (CPU/GPU detection), virtual environment validation (.venv), FFmpeg binary availability check, and isolated model loading smoke tests.
+   - Set up standard project structure with configuration files (config.yaml), CLI entry points (run.py), unit tests (tests/), and documentation (README.md, APPROACH.md, prompts.txt).
 
 ============================================================
 PROMPT 002
 ============================================================
-Tool: User Prompt Iteration
 Date: 2026-08-25
-Purpose: E2E Pipeline Real Video Verification with Short Sample
 
 Prompt:
-"can please use this url this is same but a short video we will go for this first lets go:
-https://youtu.be/dPTKl5H5ftg"
+Can you please test the pipeline end-to-end on a short video sample first? Let's use this YouTube URL:
+https://youtu.be/dPTKl5H5ftg
 
-Impact:
-Switched initial E2E pipeline verification target URL to short YouTube video sample (`https://youtu.be/dPTKl5H5ftg`) for fast visual evidence verification and temporal search alignment.
+Please verify video acquisition, audio transcription, frame sampling, text detection, and candidate score calculation on this sample to ensure the core pipeline runs cleanly without runtime errors before we test longer clips.
 
 ============================================================
 PROMPT 003
 ============================================================
-Tool: Engineering Handoff & Architecture Evolution Specification
 Date: 2026-08-25
-Purpose: Dual-Path Production-Oriented Architecture Upgrade
 
 Prompt:
-Project History & Engineering Handoff Document expanding system to production-oriented dual discovery architecture:
-- Data models (`ModalityScores`, `TrackedBox`, `TextEvent`, `Candidate`, `SearchStats` in `src/models.py`)
-- Visual Discovery Path (Visual Change Scout 1 FPS + Periodic Detector 0.5 FPS -> Trigger Merge 2s -> Dense Sampling 10 FPS -> Text Detection -> IoU Text Tracking)
-- Candidate Association & Missing-Modality Score Fusion (`src/scoring.py`)
-- Top-K deduplicated multi-candidate result contract
-- Updated tests and documentation (`README.md`, `APPROACH.md`, `experiments/`)
+Please expand the system architecture from a single ASR MVP into a production-oriented Dual-Path Retrieval Architecture with independent audio and visual discovery channels:
 
-Impact:
-Upgraded system from single ASR-dependent MVP to full dual-path production architecture capable of locating silent visual text cards, spoken audio dialogue, and multimodal occurrences with IoU tracking and score fusion.
+1. Data Models & Schemas:
+   - Define central dataclasses in src/models.py: ModalityScores, TrackedBox, TextEvent, Candidate, SearchStats, ASRQuerySpan, VisualTrackSpan, and EvidenceMetadata.
+
+2. Visual Discovery Pipeline:
+   - Implement Visual Change Scout at 1.0 FPS using frame pixel difference thresholding.
+   - Implement Periodic Text Detector at 0.5 FPS as recall insurance for static backgrounds.
+   - Implement Trigger Merging with a 2.0s temporal merge window.
+   - Implement Dense Sampling within triggered windows at 3.0 FPS.
+   - Implement Multi-Box IoU Tracking linking text bounding boxes across consecutive frames into continuous tracks.
+
+3. Candidate Association & Score Fusion:
+   - Implement score fusion with missing-modality normalization in src/scoring.py (ASR weight: 0.30, OCR weight: 0.50, Semantic weight: 0.20).
+   - Implement candidate temporal association merging audio and visual candidates within association windows.
+   - Implement top-K candidate deduplication returning structured JSON output contracts.
 
 ============================================================
 PROMPT 004
 ============================================================
-Tool: Architectural Corrections & Test Matrix Expansion
 Date: 2026-08-25
-Purpose: Precision Refinements & Test Expansion
 
 Prompt:
-User corrections to architecture plan:
-- Strict PaddleOCR 3.x API separation: dedicated TextDetection for detection-only stage, full OCR pipeline for recognition
-- Dual-path retrieval terminology (audio evidence + visual evidence)
-- Explicit sampling limitation disclosure for short-lived text (<1.0s)
-- 3 mandatory tests: static scene text (periodic detector check), simultaneous multi-box tracking, text disappearance/reappearance
-- Comprehensive unit test suite expansion across all 9 test modules
+Please apply the following precision refinements and test suite expansions:
 
-Impact:
-Applied strict boundary encapsulation for PaddleOCR 3.x detection vs recognition, refined dual-path retrieval terminology, added 3 critical tracker/detector unit tests, and expanded testing suite.
+1. Strict OCR Engine API Boundary Separation:
+   - Separate text detection from full OCR recognition: use dedicated detection-only models for candidate box discovery, and full recognition models only for cropped text regions.
+
+2. Terminology & Limitations:
+   - Formalize dual-path retrieval terminology across codebase and documentation (Audio Evidence Path vs. Visual Discovery Path).
+   - Explicitly document temporal recall limitations for extremely short-lived visual text (< 1.0s duration).
+
+3. Unit Test Suite Expansion:
+   - Add dedicated unit test cases for static scene text (periodic detector check), simultaneous multi-box tracking, and text disappearance/reappearance across frames.
+   - Expand unit test coverage across all test modules in tests/.
 
 ============================================================
 PROMPT 005
 ============================================================
-Tool: Deep Investigation & E2E Validation Guidance
 Date: 2026-08-25
-Purpose: Root-Cause Investigation of Visual Path & ASR Timestamp Propagation
 
 Prompt:
-User directive to halt "fully verified" declaration and conduct rigorous end-to-end debugging:
-1. Diagnose why visual discovery produced `tracked_events: 0` and `visual_text_match: false`
-2. Investigate complete visual pipeline stages: Scout -> Periodic -> Merge -> Dense -> Detection -> IoU Tracking -> Frame Selection -> Recognition -> Matching
-3. Verify ASR candidate timestamp propagation (preventing automatic 0.0s timestamp assignment)
-4. Create dedicated frame diagnostic test verifying text detection, OCR recognition, and text similarity threshold on exact video frame
-5. Re-run test suite and E2E validation to confirm BOTH `speech_match: true` AND `visual_text_match: true`
+Do not declare the system fully verified until we perform deep root-cause debugging across the visual pipeline and timestamp propagation:
 
-Impact:
-Initiated systematic diagnostic instrumentation across all pipeline stages, corrected ASR start timestamp propagation, ensured robust OCR polygon normalization, and verified multimodal E2E match on sample video.
+1. Visual Discovery Diagnostics:
+   - Investigate why visual discovery currently returns tracked_events: 0 and visual_text_match: false on test clips.
+   - Log each visual pipeline stage explicitly: Scout Triggers -> Periodic Triggers -> Merged Windows -> Dense Sampling -> Text Detection -> IoU Tracking -> Frame Selection -> OCR Recognition -> Fuzzy Matching.
+
+2. ASR Candidate Timestamp Propagation:
+   - Verify that ASR candidate start timestamps are correctly propagated to candidates rather than falling back to 0.0s.
+
+3. Exact Frame Diagnostic Test:
+   - Create a dedicated single-frame diagnostic test verifying text detection bounding boxes, OCR text recognition, and similarity scoring on exact video frames containing on-screen captions.
+   - Re-run test suite and E2E validation to confirm BOTH speech_match: true AND visual_text_match: true for multimodal clips.
 
 ============================================================
 PROMPT 006
 ============================================================
-Tool: Golden Evaluation Test Suite & Regression Fixture Specification
 Date: 2026-08-25
-Purpose: Institutionalizing Golden Evaluation Matrix & Benchmark Standards
 
 Prompt:
-User directive to freeze Golden Evaluation Test Suite and document permanent evaluation benchmarks across README.md, APPROACH.md, and tests/fixtures/README.md:
-- Test Video 1: `YVvD7SZ7kc0` (Spoken-only queries + Silent Visual Text query "Thank you for watching")
-- Test Video 2: `WZORRHNP9_w` (Multimodal Spoken + Visual query "At least tell me your name" + Negative Control queries "Batman", "The blue elephant is dancing")
-- Explicit 7-query ground truth matrix defining ASR, OCR, expected path, expected modality sources, and NOT_FOUND status requirements
-- Explicit temporal recall limitation disclosure for short-lived silent visual text (<0.5s)
+Please freeze the Golden Evaluation Test Suite and document permanent evaluation benchmark specifications across README.md, APPROACH.md, and tests/fixtures/README.md:
 
-Impact:
-Established permanent Golden Evaluation Matrix documentation and automated regression testing script (`tests/fixtures/README.md` and `scripts/run_golden_suite.py`) validating spoken-only, silent visual text, multimodal confirmation, and negative controls.
+1. Test Media & Queries:
+   - Test Video 1 (YVvD7SZ7kc0): Spoken-only dialogue queries ("Why Do We Fall?", "so that we can learn to pick ourselves", "have you quite given up on me?") and Silent Visual Text query ("Thank you for watching").
+   - Test Video 2 (WZORRHNP9_w): Multimodal Spoken + Visual query ("At least tell me your name") and Negative Control queries ("Batman", "The blue elephant is dancing").
+
+2. Golden Matrix Definition:
+   - Create machine-readable manifest tests/fixtures/golden_tests.yaml defining exact ground truth modalities, expected status (FOUND / NOT_FOUND), expected modality sources (["asr"], ["ocr"], ["asr", "ocr"]), and expected evidence flags.
+   - Document temporal recall limitations for short-lived silent visual text (<0.5s duration).
 
 ============================================================
 PROMPT 007
 ============================================================
-Tool: Final Golden Test Execution & Evidence Report Task
 Date: 2026-08-25
-Purpose: Complete Automated Golden Suite Execution & Report Generation
 
 Prompt:
-Master execution directive:
-1. Remove outdated demo references and clean stale test artifacts
-2. Freeze `tests/fixtures/golden_tests.yaml` with exact 7 golden test cases (4 for YVvD7SZ7kc0, 3 for WZORRHNP9_w)
-3. Execute all 7 test cases individually, outputting actual pipeline logs and real JSON results for each case
-4. Save structured result JSON files into `tests/evaluation_results/case_01.json` through `case_07.json`
-5. Organize evidence images into `tests/evaluation_results/evidence/case_01/` through `case_05/`
-6. Enforce git hygiene (no downloaded mp4/webm/venv binaries committed)
-7. Generate comprehensive human-readable `tests/evaluation_results/GOLDEN_TEST_REPORT.md` report
+Please execute the complete Golden Evaluation Test Suite end-to-end:
 
-Impact:
-Fully executed and documented the official 7-case Golden Evaluation Benchmark suite, generated individual case result artifacts and evidence images, and published the final GOLDEN_TEST_REPORT.md report.
+1. Environment & Cleanup:
+   - Remove outdated demo references and clean stale temporary test artifacts.
+   - Validate tests/fixtures/golden_tests.yaml containing the 7 official test cases.
+
+2. Execution & Output Preservation:
+   - Run all 7 test cases individually, outputting actual execution logs and full JSON response contracts.
+   - Save individual result JSON files into tests/evaluation_results/case_01.json through case_07.json.
+   - Copy evidence JPG images into tests/evaluation_results/evidence/case_01/ through case_05/.
+   - Generate human-readable markdown report tests/evaluation_results/GOLDEN_TEST_REPORT.md containing environment metadata and full test matrix results.
 
 ============================================================
 PROMPT 008
 ============================================================
-Tool: Output Directory Reorganization & Git Evidence Tracking
 Date: 2026-08-25
-Purpose: Version-Controlling Evaluation Evidence Artifacts
 
 Prompt:
-User instruction to update `.gitignore` and output directory structure:
-- Change `.gitignore` so `outputs/evaluation/` is version-controlled and NOT ignored
-- Keep `outputs/runtime/` and `outputs/tmp/` ignored for temporary files
-- Save intentional evidence frames for golden test cases under `outputs/evaluation/case_01/` through `case_05/`
-- Verify git tracking state (`git check-ignore -v`) and commit evidence artifacts
+Please update .gitignore and output directory structure to version-control golden evaluation evidence:
 
-Impact:
-Structured `outputs/evaluation/` for version-controlled evidence frames, updated `.gitignore`, verified non-ignored status via git, and committed golden evaluation evidence artifacts to repository.
+1. Directory Restructuring:
+   - Update .gitignore so outputs/evaluation/ is version-controlled and NOT ignored by Git.
+   - Keep temporary runtime files under outputs/runtime/ and outputs/tmp/ ignored.
+
+2. Evidence File Organization:
+   - Organize evidence JPG images for golden evaluation cases under outputs/evaluation/case_01/ through case_05/.
+   - Verify Git tracking state using git check-ignore -v to confirm evidence images are tracked.
 
 ============================================================
 PROMPT 009
 ============================================================
-Tool: Golden Evaluation Final Verification Instruction
 Date: 2026-08-25
-Purpose: Verification & Execution Audit across 7 Golden Test Cases
 
 Prompt:
-Final verification instruction:
-1. URL sanitization: automatically strip Markdown wrapper syntax `[...]` from incoming video URLs
-2. Perform clean, complete execution of all 7 Golden Test Cases (Case 1: "Why Do We Fall?", Case 2: "so that we can learn to pick ourselves", Case 3: "Thank you for watching", Case 4: "have you quite given up on me?", Case 5: "At least tell me your name", Case 6: "Batman", Case 7: "The blue elephant is dancing")
-3. Save structured JSON outputs into `tests/evaluation_results/case_01_why_do_we_fall.json` through `case_07_blue_elephant.json`
-4. Save evidence frames under `outputs/evaluation/case_01/` through `case_05/`
-5. Explicitly verify multimodal score fusion on Case 5 and negative control precision on Cases 6 & 7
-6. Generate `tests/evaluation_results/GOLDEN_TEST_REPORT.md` with environment info and complete case outputs
-7. Update `.gitignore` to preserve `outputs/evaluation/` while ignoring temporary media downloads
-8. Commit golden evaluation results and evidence artifacts to Git repository
+Please execute final golden suite verification and URL sanitization:
 
-Impact:
-Implemented URL markdown sanitization, updated `.gitignore` rules for evidence tracking, executed full Golden Evaluation verification suite, published final GOLDEN_TEST_REPORT.md report, and committed benchmark evidence artifacts.
+1. Input URL Handling:
+   - Add automatic URL markdown sanitization stripping bracket wrappers like [...] from incoming video URLs.
+
+2. Suite Execution:
+   - Perform clean execution across all 7 Golden Test Cases (Case 1: "Why Do We Fall?", Case 2: "so that we can learn to pick ourselves", Case 3: "Thank you for watching", Case 4: "have you quite given up on me?", Case 5: "At least tell me your name", Case 6: "Batman", Case 7: "The blue elephant is dancing").
+   - Save structured output JSON files into tests/evaluation_results/case_01_why_do_we_fall.json through case_07_blue_elephant.json.
+   - Save evidence frames under outputs/evaluation/case_01/ through case_05/.
+   - Verify multimodal score fusion on Case 5 and negative control precision on Cases 6 & 7 (NOT_FOUND).
+   - Publish GOLDEN_TEST_REPORT.md and commit benchmark evidence artifacts.
 
 ============================================================
 PROMPT 010
 ============================================================
-Tool: Golden Test Visual Pipeline Instrumentation & Diagnostic Directive
 Date: 2026-08-25
-Purpose: Deep Observability & Failure Root-Cause Analysis for Silent Visual Retrieval
 
 Prompt:
-User instruction to halt suite execution and instrument Case 3 ("Thank you for watching" on `YVvD7SZ7kc0`):
-1. Detailed stage-by-stage logging:
-   - Scout & Periodic triggers (`raw_change_triggers`, `raw_periodic_triggers`, `merged_trigger_windows` with start/end/duration/source, `triggered_duration_ratio`)
-   - Dense sampling deduplication (`dense_fps`, `requested_dense_frames`, `actual_dense_frames`, `duplicate_frames_skipped`)
-   - Text detection per frame (`timestamp`, `number_of_boxes`, `box_confidences`)
-   - Track creation (`track_id`, `start`, `end`, `duration`, `number_of_boxes`, `best_frame_timestamp`)
-   - Unfiltered OCR recognition logging per track (`track_id`, `best_frame_timestamp`, `ocr_text`, `ocr_confidence`, `query_similarity`)
-2. Debug evidence export:
-   - Save best frame images for all tracks into `outputs/debug_case_03/track_000.jpg`, `track_001.jpg`, etc.
-   - Save structured track metadata into `outputs/debug_case_03/tracks.json`
-3. Failure classification across 7 precise categories (A–G)
-4. Stage-by-stage execution profiling timers (`scout_time`, `periodic_detection_time`, `trigger_merge_time`, `dense_sampling_time`, `text_detection_time`, `tracking_time`, `ocr_time`, `candidate_matching_time`, `total_runtime`, `ocr_initialization_count`)
+Halt test suite execution and instrument deep stage-by-stage observability for Case 3 ("Thank you for watching" on YVvD7SZ7kc0):
 
-Impact:
-Instrumented `src/visual_pipeline.py` with deep stage observability, detailed profiling timers, track-level frame dump, and `outputs/debug_case_03/tracks.json` metadata for Case 3 visual retrieval diagnosis.
+1. Deep Stage Observability Logging:
+   - Log Scout & Periodic triggers: raw_change_triggers, raw_periodic_triggers, merged_trigger_windows (start, end, duration, source), and triggered_duration_ratio.
+   - Log Dense Sampling: dense_fps, requested_dense_frames, actual_dense_frames, and duplicate_frames_skipped.
+   - Log Text Detection: per-frame timestamp, number_of_boxes, and box_confidences.
+   - Log Tracking: track_id, start, end, duration, number_of_boxes, and best_frame_timestamp.
+   - Log Unfiltered OCR: per-track track_id, best_frame_timestamp, ocr_text, ocr_confidence, and query_similarity.
+
+2. Diagnostic Evidence & Profiling:
+   - Export best frame images for all visual tracks into outputs/debug_case_03/track_000.jpg, track_001.jpg, etc.
+   - Export structured track metadata to outputs/debug_case_03/tracks.json.
+   - Track stage profiling timers: scout_time, periodic_detection_time, trigger_merge_time, dense_sampling_time, text_detection_time, tracking_time, ocr_time, candidate_matching_time, and total_runtime.
 
 ============================================================
 PROMPT 011
 ============================================================
-Tool: Architecture Redesign Brief & ASR-Guided Targeted Visual Discovery
 Date: 2026-08-25
-Purpose: ASR Word-Level Timestamp Span Extraction & Targeted Visual Windowing
 
 Prompt:
-We need to redesign the video text/dialogue localization pipeline.
-1. Word-Level Timestamp ASR Span Extraction:
-   - Whisper word timestamps are estimates, not frame-accurate ground truth.
-   - Distinguish ASR_ESTIMATED_QUERY_SPAN (`asr_query_start`, `asr_query_end`) from VISUAL_EVIDENCE_TIMESTAMP.
-   - Implement `find_query_span()` in `src/asr.py` to extract exact word-level query bounds.
-2. ASR-Guided Targeted Visual Windowing:
-   - When ASR candidate is found, restrict visual search window to `[asr_query_start - 1.5s, asr_query_end + 3.5s]`.
-   - When ASR candidate is weak/absent (e.g. Case 3 silent visual text), fall back to global visual scout (1 FPS) + text-bearing trigger filtering.
+We need to redesign the video text/dialogue localization pipeline to solve temporal timestamp mismatches:
 
-Impact:
-Implemented `find_query_span()` in `src/asr.py` and targeted search windowing in `src/visual_pipeline.py`, reducing visual discovery runtime on ASR-matched clips from ~450s to < 20s.
+1. Word-Level Timestamp ASR Query Span Extraction:
+   - Whisper word timestamps are estimates, not frame-accurate ground truth.
+   - Distinguish ASR_ESTIMATED_QUERY_SPAN (asr_query_start, asr_query_end) from VISUAL_EVIDENCE_TIMESTAMP.
+   - Implement find_query_span() in src/asr.py to extract exact word-level query bounds from Whisper word-level timestamp lists.
+
+2. ASR-Guided Targeted Visual Search Windowing:
+   - When a strong ASR candidate is found, restrict the visual search window to [asr_query_start - 1.5s, asr_query_end + 3.5s] instead of scanning the full video.
+   - When ASR candidate is weak or absent (e.g., Case 3 silent visual text), fall back to global visual scout (1.0 FPS) with coarse text-bearing trigger filtering.
 
 ============================================================
 PROMPT 012
 ============================================================
-Tool: Multi-Metric Candidate Association & Track Representative Frame Selection
 Date: 2026-08-25
-Purpose: P0 Shadowing Bug Resolution & P1 Visual Evidence Timestamp Precision
 
 Prompt:
-1. Configurable OCR Acceptance Policy:
-   - Use multi-metric association combining temporal compatibility (`5.0s` window), normalized token overlap, fuzzy character similarity, OCR confidence, and query similarity threshold (`ocr_min_threshold = 0.45`).
-2. Representative Track Frame Sampling (P1 Fix):
-   - Sample candidate frames across full track duration `[track.start, ..., track.end]`, evaluate OCR query similarity, and dynamically set `best_frame_timestamp` to the highest-scoring frame.
-3. Function Shadowing Root-Cause Resolution (P0 Fix):
-   - Diagnose `TypeError: got an unexpected keyword argument 'ocr_min_threshold'`.
-   - Remove stale duplicate `def associate_and_fuse_candidates` from `src/pipeline.py` (lines 37–93) and import canonical implementation from `src.candidate_association`.
+APPROVED WITH REQUIRED CHANGES. Please incorporate these three corrections before proceeding:
 
-Impact:
-Resolved P0 function shadowing bug in `src/pipeline.py`, implemented P1 track representative frame sampling selecting 15.18s/15.35s visual OCR frame for Case 5, and validated all 36 unit tests.
+1. Configurable OCR Acceptance Policy:
+   - Implement multi-metric candidate association combining temporal compatibility (5.0s window), normalized token overlap, fuzzy character similarity, OCR confidence, and query similarity thresholding (ocr_min_threshold = 0.45).
+
+2. Representative Track Frame Sampling:
+   - Sample candidate frames across the full track duration [track.start, ..., track.end], evaluate OCR query similarity for each frame, and dynamically set best_frame_timestamp to the frame with the highest query similarity.
+
+3. Function Shadowing Bug Fix:
+   - Diagnose TypeError: associate_and_fuse_candidates() got an unexpected keyword argument 'ocr_min_threshold'.
+   - Remove stale duplicate inline function def associate_and_fuse_candidates from src/pipeline.py (lines 37–93) and import the canonical implementation from src.candidate_association.
 
 ============================================================
 PROMPT 013
 ============================================================
-Tool: Baseline Freeze & Repository Audit Directive
 Date: 2026-08-25
-Purpose: v1.0.0 Baseline Release & Repository Hygiene
 
 Prompt:
-STOP architectural changes. Freeze current working behavior as v1.0. Perform complete repository cleanup:
-- Remove temporary debug files, generated outputs, downloaded media, caches, stale duplicate code, temporary diagnostics, and development artifacts.
-- Fix final JSON serializer so output is valid and non-duplicated.
-- Preserve 36 unit tests across 11 test modules.
-- Audit repository for secrets and machine-specific paths.
-- Create proper .gitignore and README.md.
-- Create git commit and tag `v1.0.0`.
+STOP architectural changes. Freeze current working behavior as v1.0 and perform complete repository cleanup:
 
-Impact:
-Cleaned repository, performed security audit (zero credentials/secrets), verified 36 unit tests, created git commit `Release v1.0.0: Stable dual-path video dialogue locator baseline` (`95a0111`), and tagged `v1.0.0`.
+1. Codebase Cleanup:
+   - Remove temporary debug files, temporary inspect logs, generated outputs, downloaded media, caches, stale duplicate functions, and development artifacts.
+   - Fix final JSON serializer to ensure valid, non-duplicated JSON outputs.
+
+2. Verification & Version Control:
+   - Audit codebase for hardcoded credentials, personal tokens, or machine-specific absolute paths.
+   - Preserve all 36 unit tests across 11 test modules.
+   - Create clean .gitignore and master README.md.
+   - Create git commit and tag release v1.0.0.
 
 ============================================================
 PROMPT 014
 ============================================================
-Tool: Technical Documentation Audit & Modular Engineering Docs
 Date: 2026-08-25
-Purpose: Production-Grade Documentation Rewrite Derived from Codebase Authority
 
 Prompt:
-Perform a strict documentation audit and rewrite README.md strictly from source code, configs, tests, scripts, and verified golden cases:
-- Do NOT infer architecture from existing README.
-- Correct stale parameters (`association_window = 5.0s`, `dense_fps = 3.0`, `test_count = 36`).
-- Create modular docs under `docs/`: `ARCHITECTURE.md`, `CONFIGURATION.md`, `TESTING.md`, `OUTPUT_SCHEMA.md`.
-- Ensure 100% relative repository links; no local `file:///` URLs or absolute paths.
+Perform a strict technical documentation audit and rewrite README.md strictly derived from codebase authority:
 
-Impact:
-Created modular engineering documentation under `docs/` and updated `README.md` to reflect actual `v1.0.0` implementation, 36 unit tests, and verified golden benchmark behaviors.
+1. Repository Source Audit:
+   - Audit source code, config files (config.yaml vs config.dev.yaml), test suite, scripts, and verified golden case JSON outputs.
+   - Correct all stale parameters (association_window = 5.0s, dense_fps = 3.0, test_count = 36).
+
+2. Modular Engineering Documentation:
+   - Create modular technical documentation files under docs/: ARCHITECTURE.md (deep stage breakdown and formulas), CONFIGURATION.md (parameter specification table), TESTING.md (unit tests and golden benchmark matrix), and OUTPUT_SCHEMA.md (JSON response contract).
+   - Ensure 100% relative repository links; do NOT use local file:/// scheme links or Windows absolute paths.
 
 ============================================================
 PROMPT 015
 ============================================================
-Tool: Mermaid Architecture Diagram System Integration
 Date: 2026-08-25
-Purpose: Native GitHub Mermaid Diagram Architecture Visualization
 
 Prompt:
-Integrate a professional Mermaid architecture diagram system:
-1. Level 1 Executive System Architecture diagram showing Dual-Path Retrieval, Candidate Association & Score Fusion, and Modality-Aware Evidence Selection.
-2. Level 2 Visual Search Funnel diagram explaining the 5-stage reduction policy using verified Case 3 metrics (121.31s video -> 61 windows -> 6 text-bearing windows -> 36 dense frames -> 11 tracks -> OCR 111.500s frame).
-3. Create standalone version-controlled `.mmd` files in `docs/diagrams/`.
+Integrate a professional Mermaid architecture diagram system into the documentation:
 
-Impact:
-Embedded GitHub-native Mermaid flowcharts into `README.md` and created version-controlled `.mmd` diagram files in `docs/diagrams/`.
+1. System Architecture Diagram:
+   - Create a Level 1 Executive System Architecture flowchart showing Dual-Path Retrieval, Candidate Association & Score Fusion, and Modality-Aware Evidence Selection.
+
+2. Visual Search Funnel Diagram:
+   - Create a Level 2 Visual Search Funnel flowchart detailing the Progressive Visual Search Reduction policy using verified Case 3 metrics (121.31s video -> 61 windows -> 6 text-bearing windows -> 36 dense frames -> 11 tracks -> 99 OCR calls -> 111.500s evidence frame).
+
+3. File Integration:
+   - Embed GitHub-native Mermaid flowcharts directly into README.md and docs/ARCHITECTURE.md.
+   - Create standalone version-controlled .mmd diagram files under docs/diagrams/.
 
 ============================================================
 PROMPT 016
 ============================================================
-Tool: Golden Benchmark Test Suite Expansion & Explicit Video Links
 Date: 2026-08-25
-Purpose: Complete 7-Case Golden Benchmark Reference & Direct YouTube Links
 
 Prompt:
-Add explicit reference sections and CLI commands for ALL 7 Golden Test Cases:
-- Case 1: Spoken Query ("Why Do We Fall?") -> `execute_single_case.py 1`
-- Case 2: Spoken Query ("so that we can learn to pick ourselves") -> `execute_single_case.py 2`
-- Case 3: Silent Visual Text Query ("Thank you for watching") -> `execute_single_case.py 3`
-- Case 4: Spoken Query ("have you quite given up on me?") -> `execute_single_case.py 4`
-- Case 5: Multimodal Query ("At least tell me your name") -> `execute_single_case.py 5`
-- Case 6: Negative Control Query ("Batman") -> `execute_single_case.py 6`
-- Case 7: Unrelated Negative Control Query ("The blue elephant is dancing") -> `execute_single_case.py 7`
-- Attach direct clickable YouTube video links for all cases.
+Add explicit reference sections, execution commands, and video links for ALL 7 Golden Test Cases:
 
-Impact:
-Updated `README.md` and `docs/TESTING.md` with explicit execution commands for Cases 1 through 7 and direct YouTube video links (`https://www.youtube.com/watch?v=YVvD7SZ7kc0` and `https://www.youtube.com/shorts/WZORRHNP9_w`).
-============================================================
+1. Benchmark Reference Sections:
+   - Add explicit subsections and CLI execution commands for Case 1 through Case 7:
+     - Case 1: Spoken Query ("Why Do We Fall?") -> execute_single_case.py 1
+     - Case 2: Spoken Query ("so that we can learn to pick ourselves") -> execute_single_case.py 2
+     - Case 3: Silent Visual Text Query ("Thank you for watching") -> execute_single_case.py 3
+     - Case 4: Spoken Query ("have you quite given up on me?") -> execute_single_case.py 4
+     - Case 5: Multimodal Query ("At least tell me your name") -> execute_single_case.py 5
+     - Case 6: Negative Control Query ("Batman") -> execute_single_case.py 6
+     - Case 7: Unrelated Negative Control Query ("The blue elephant is dancing") -> execute_single_case.py 7
 
+2. Video Source Links & Suite Runner:
+   - Attach direct clickable YouTube links for all cases (https://www.youtube.com/watch?v=YVvD7SZ7kc0 and https://www.youtube.com/shorts/WZORRHNP9_w).
+   - Feature python scripts/run_golden_suite.py as the single canonical benchmark suite runner.

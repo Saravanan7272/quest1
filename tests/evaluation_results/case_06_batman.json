@@ -16,12 +16,12 @@
       "ocr_calls": 55,
       "candidates_found": 0,
       "tracked_events": 10,
-      "runtime_seconds": 192.5
+      "runtime_seconds": 215.67
     }
   },
   "evidence_image_path": "",
   "evaluation": {
     "passed": true,
-    "reason": "Status matched expected 'NOT_FOUND'"
+    "reason": "Status matched 'NOT_FOUND'"
   }
 }
