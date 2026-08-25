@@ -85,10 +85,11 @@ flowchart TD
     ROOT["VIDEO DIALOGUE LOCATOR"]
     
     subgraph BASELINE["v1.0.0 BASELINE (What exists today)"]
-        B_CORRECT["Correctness Baseline"]
-        B_EVAL["Evaluation (7 Cases, 36 Tests)"]
-        B_CORE["Core Dual-Path Architecture"]
-        B_RETR["ASR + OCR Retrieval & Score Fusion"]
+        direction TB
+        B_CORRECT["Correctness"]
+        B_EVAL["Evaluation"]
+        B_CORE["Core"]
+        B_RETR["ASR + OCR Retrieval"]
         
         B_CORRECT --- B_RETR
         B_EVAL --- B_RETR
@@ -96,13 +97,14 @@ flowchart TD
     end
 
     subgraph ROADMAP["EVOLUTION ROADMAP (What requirements trigger the next architecture)"]
-        R_QUAL["Quality Pillar"]
-        R_SCALE["Scale & Performance Pillar"]
-        R_PROD["Product & Operations Pillar"]
+        direction TB
+        R_QUAL["Quality"]
+        R_SCALE["Scale"]
+        R_PROD["Product"]
         
-        R_QUAL_DETAILS["Semantic Vector Retrieval<br/>Multilingual ASR & OCR<br/>Score Calibration<br/>Temporal Accuracy (t-IoU)"]
-        R_SCALE_DETAILS["Persistent Video Indexing<br/>GPU Worker Acceleration<br/>Feature Caching<br/>Distributed Worker Queue"]
-        R_PROD_DETAILS["REST Search API<br/>Interactive Web UI<br/>User Feedback Loop<br/>Multi-Video Corpus Search"]
+        R_QUAL_DETAILS["Semantic<br/>Multilingual<br/>Calibration<br/>Temporal accuracy"]
+        R_SCALE_DETAILS["Index<br/>GPU<br/>Cache<br/>Distributed"]
+        R_PROD_DETAILS["API / UI<br/>Feedback"]
         
         R_QUAL --- R_QUAL_DETAILS
         R_SCALE --- R_SCALE_DETAILS
