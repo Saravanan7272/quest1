@@ -66,4 +66,22 @@ User corrections to architecture plan:
 
 Impact:
 Applied strict boundary encapsulation for PaddleOCR 3.x detection vs recognition, refined dual-path retrieval terminology, added 3 critical tracker/detector unit tests, and expanded testing suite.
+
+============================================================
+PROMPT 005
+============================================================
+Tool: Deep Investigation & E2E Validation Guidance
+Date: 2026-08-25
+Purpose: Root-Cause Investigation of Visual Path & ASR Timestamp Propagation
+
+Prompt:
+User directive to halt "fully verified" declaration and conduct rigorous end-to-end debugging:
+1. Diagnose why visual discovery produced `tracked_events: 0` and `visual_text_match: false`
+2. Investigate complete visual pipeline stages: Scout -> Periodic -> Merge -> Dense -> Detection -> IoU Tracking -> Frame Selection -> Recognition -> Matching
+3. Verify ASR candidate timestamp propagation (preventing automatic 0.0s timestamp assignment)
+4. Create dedicated frame diagnostic test verifying text detection, OCR recognition, and text similarity threshold on exact video frame
+5. Re-run test suite and E2E validation to confirm BOTH `speech_match: true` AND `visual_text_match: true`
+
+Impact:
+Initiated systematic diagnostic instrumentation across all pipeline stages, corrected ASR start timestamp propagation, ensured robust OCR polygon normalization, and verified multimodal E2E match on sample video.
 ============================================================

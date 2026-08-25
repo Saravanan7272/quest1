@@ -119,7 +119,18 @@ def download_video(url: str, output_dir: Path) -> VideoMetadata:
         "overwrites": True
     }
     
-    logger.info(f"Downloading video from URL: {url}")
+    logger.info(f"Acquiring video from: {url}")
+    local_path = Path(url)
+    if local_path.exists() and local_path.is_file():
+        target_file = output_dir / local_path.name
+        shutil.copy2(local_path, target_file)
+        metadata = get_video_metadata(target_file)
+        logger.info(
+            f"Local video acquired: Duration={metadata.duration:.2f}s, FPS={metadata.fps:.2f}, "
+            f"Resolution={metadata.width}x{metadata.height}, HasAudio={metadata.has_audio}"
+        )
+        return metadata
+
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])

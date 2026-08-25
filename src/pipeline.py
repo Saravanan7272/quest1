@@ -290,7 +290,7 @@ def locate_dialogue_in_video(
                 "image_path": img_rel_path,
                 "sources": sources,
                 "evidence": {
-                    "speech_match": (cand.scores.asr is not None and cand.scores.asr >= 0.60),
+                    "speech_match": (cand.scores.asr is not None and cand.scores.asr >= asr_cfg.get("candidate_threshold", 0.50)),
                     "visual_text_match": (cand.scores.ocr is not None and cand.scores.ocr >= sim_thresh)
                 },
                 "scores": {
