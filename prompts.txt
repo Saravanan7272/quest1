@@ -183,4 +183,117 @@ User instruction to halt suite execution and instrument Case 3 ("Thank you for w
 
 Impact:
 Instrumented `src/visual_pipeline.py` with deep stage observability, detailed profiling timers, track-level frame dump, and `outputs/debug_case_03/tracks.json` metadata for Case 3 visual retrieval diagnosis.
+
 ============================================================
+PROMPT 011
+============================================================
+Tool: Architecture Redesign Brief & ASR-Guided Targeted Visual Discovery
+Date: 2026-08-25
+Purpose: ASR Word-Level Timestamp Span Extraction & Targeted Visual Windowing
+
+Prompt:
+We need to redesign the video text/dialogue localization pipeline.
+1. Word-Level Timestamp ASR Span Extraction:
+   - Whisper word timestamps are estimates, not frame-accurate ground truth.
+   - Distinguish ASR_ESTIMATED_QUERY_SPAN (`asr_query_start`, `asr_query_end`) from VISUAL_EVIDENCE_TIMESTAMP.
+   - Implement `find_query_span()` in `src/asr.py` to extract exact word-level query bounds.
+2. ASR-Guided Targeted Visual Windowing:
+   - When ASR candidate is found, restrict visual search window to `[asr_query_start - 1.5s, asr_query_end + 3.5s]`.
+   - When ASR candidate is weak/absent (e.g. Case 3 silent visual text), fall back to global visual scout (1 FPS) + text-bearing trigger filtering.
+
+Impact:
+Implemented `find_query_span()` in `src/asr.py` and targeted search windowing in `src/visual_pipeline.py`, reducing visual discovery runtime on ASR-matched clips from ~450s to < 20s.
+
+============================================================
+PROMPT 012
+============================================================
+Tool: Multi-Metric Candidate Association & Track Representative Frame Selection
+Date: 2026-08-25
+Purpose: P0 Shadowing Bug Resolution & P1 Visual Evidence Timestamp Precision
+
+Prompt:
+1. Configurable OCR Acceptance Policy:
+   - Use multi-metric association combining temporal compatibility (`5.0s` window), normalized token overlap, fuzzy character similarity, OCR confidence, and query similarity threshold (`ocr_min_threshold = 0.45`).
+2. Representative Track Frame Sampling (P1 Fix):
+   - Sample candidate frames across full track duration `[track.start, ..., track.end]`, evaluate OCR query similarity, and dynamically set `best_frame_timestamp` to the highest-scoring frame.
+3. Function Shadowing Root-Cause Resolution (P0 Fix):
+   - Diagnose `TypeError: got an unexpected keyword argument 'ocr_min_threshold'`.
+   - Remove stale duplicate `def associate_and_fuse_candidates` from `src/pipeline.py` (lines 37–93) and import canonical implementation from `src.candidate_association`.
+
+Impact:
+Resolved P0 function shadowing bug in `src/pipeline.py`, implemented P1 track representative frame sampling selecting 15.18s/15.35s visual OCR frame for Case 5, and validated all 36 unit tests.
+
+============================================================
+PROMPT 013
+============================================================
+Tool: Baseline Freeze & Repository Audit Directive
+Date: 2026-08-25
+Purpose: v1.0.0 Baseline Release & Repository Hygiene
+
+Prompt:
+STOP architectural changes. Freeze current working behavior as v1.0. Perform complete repository cleanup:
+- Remove temporary debug files, generated outputs, downloaded media, caches, stale duplicate code, temporary diagnostics, and development artifacts.
+- Fix final JSON serializer so output is valid and non-duplicated.
+- Preserve 36 unit tests across 11 test modules.
+- Audit repository for secrets and machine-specific paths.
+- Create proper .gitignore and README.md.
+- Create git commit and tag `v1.0.0`.
+
+Impact:
+Cleaned repository, performed security audit (zero credentials/secrets), verified 36 unit tests, created git commit `Release v1.0.0: Stable dual-path video dialogue locator baseline` (`95a0111`), and tagged `v1.0.0`.
+
+============================================================
+PROMPT 014
+============================================================
+Tool: Technical Documentation Audit & Modular Engineering Docs
+Date: 2026-08-25
+Purpose: Production-Grade Documentation Rewrite Derived from Codebase Authority
+
+Prompt:
+Perform a strict documentation audit and rewrite README.md strictly from source code, configs, tests, scripts, and verified golden cases:
+- Do NOT infer architecture from existing README.
+- Correct stale parameters (`association_window = 5.0s`, `dense_fps = 3.0`, `test_count = 36`).
+- Create modular docs under `docs/`: `ARCHITECTURE.md`, `CONFIGURATION.md`, `TESTING.md`, `OUTPUT_SCHEMA.md`.
+- Ensure 100% relative repository links; no local `file:///` URLs or absolute paths.
+
+Impact:
+Created modular engineering documentation under `docs/` and updated `README.md` to reflect actual `v1.0.0` implementation, 36 unit tests, and verified golden benchmark behaviors.
+
+============================================================
+PROMPT 015
+============================================================
+Tool: Mermaid Architecture Diagram System Integration
+Date: 2026-08-25
+Purpose: Native GitHub Mermaid Diagram Architecture Visualization
+
+Prompt:
+Integrate a professional Mermaid architecture diagram system:
+1. Level 1 Executive System Architecture diagram showing Dual-Path Retrieval, Candidate Association & Score Fusion, and Modality-Aware Evidence Selection.
+2. Level 2 Visual Search Funnel diagram explaining the 5-stage reduction policy using verified Case 3 metrics (121.31s video -> 61 windows -> 6 text-bearing windows -> 36 dense frames -> 11 tracks -> OCR 111.500s frame).
+3. Create standalone version-controlled `.mmd` files in `docs/diagrams/`.
+
+Impact:
+Embedded GitHub-native Mermaid flowcharts into `README.md` and created version-controlled `.mmd` diagram files in `docs/diagrams/`.
+
+============================================================
+PROMPT 016
+============================================================
+Tool: Golden Benchmark Test Suite Expansion & Explicit Video Links
+Date: 2026-08-25
+Purpose: Complete 7-Case Golden Benchmark Reference & Direct YouTube Links
+
+Prompt:
+Add explicit reference sections and CLI commands for ALL 7 Golden Test Cases:
+- Case 1: Spoken Query ("Why Do We Fall?") -> `execute_single_case.py 1`
+- Case 2: Spoken Query ("so that we can learn to pick ourselves") -> `execute_single_case.py 2`
+- Case 3: Silent Visual Text Query ("Thank you for watching") -> `execute_single_case.py 3`
+- Case 4: Spoken Query ("have you quite given up on me?") -> `execute_single_case.py 4`
+- Case 5: Multimodal Query ("At least tell me your name") -> `execute_single_case.py 5`
+- Case 6: Negative Control Query ("Batman") -> `execute_single_case.py 6`
+- Case 7: Unrelated Negative Control Query ("The blue elephant is dancing") -> `execute_single_case.py 7`
+- Attach direct clickable YouTube video links for all cases.
+
+Impact:
+Updated `README.md` and `docs/TESTING.md` with explicit execution commands for Cases 1 through 7 and direct YouTube video links (`https://www.youtube.com/watch?v=YVvD7SZ7kc0` and `https://www.youtube.com/shorts/WZORRHNP9_w`).
+============================================================
+
