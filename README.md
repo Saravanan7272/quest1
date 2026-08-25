@@ -163,9 +163,18 @@ Run all 7 Golden Test Cases and generate complete evaluation artifacts:
 
 ---
 
+## 🗺️ Engineering Roadmap & Strategy
+
+The `v1.0.0` release represents a deliberately scoped correctness baseline. Future evolution, technical priorities, scaling pathways, and engineering defenses are documented in:
+
+👉 **[docs/ENGINEERING_ROADMAP.md](docs/ENGINEERING_ROADMAP.md)**
+
+---
+
 ## 🛠️ Baseline Release Information
 
 - **Release Baseline**: Production-oriented v1.0.0 correctness baseline
 - **Version**: `v1.0.0`
 - **Git Tag**: `v1.0.0`
 - **Git Commit**: `e2967a3`
+
