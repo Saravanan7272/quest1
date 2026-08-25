@@ -282,7 +282,7 @@ Phase 4: API & Product Dashboard (P2)
 
 ---
 
-## 15. How We Defend These Architectural Decisions in an Engineering Review
+## 15.Architectural Decisions
 
 #### Q: "Why wasn't semantic vector search enabled in v1.0.0?"
 > **Defense**: Exact lexical matching (fuzzy phrase ratio + token coverage) provides unambiguous ground-truth verification on dialogue text. Enabling semantic search prematurely risks introducing false positives from semantically related but unspoken phrases. We preserved `scores.semantic` in the dataclasses and scoring engine as an extension point, deferring activation until empirical benchmarks demonstrate a clear lexical recall gap.

@@ -292,3 +292,48 @@ Add explicit reference sections, execution commands, and video links for ALL 7 G
 2. Video Source Links & Suite Runner:
    - Attach direct clickable YouTube links for all cases (https://www.youtube.com/watch?v=YVvD7SZ7kc0 and https://www.youtube.com/shorts/WZORRHNP9_w).
    - Feature python scripts/run_golden_suite.py as the single canonical benchmark suite runner.
+
+============================================================
+PROMPT 017
+============================================================
+Date: 2026-08-25
+
+Prompt:
+Create a canonical benchmark command and preserve evidence artifacts:
+1. Canonical Benchmark Runner:
+   - Ensure scripts/run_golden_suite.py executes all 7 Golden Test Cases end-to-end and outputs a clean summary table showing PASS/FAIL status for each case.
+   - Save individual evaluation JSON artifacts in tests/evaluation_results/ (case_01.json through case_07.json).
+2. Evidence Preservation:
+   - Preserve small intentional evidence JPG images in outputs/evaluation/ (case_01/ through case_05/).
+   - Ensure large downloaded media files remain ignored in .gitignore to maintain clean repository hygiene.
+3. Codebase Reverse-Engineering & Interview Defense:
+   - Perform complete implementation-level reverse engineering across 21 structural parts (repository map, execution trace, configuration matrix, hyperparameters, formulas, temporal logic, visual search funnel, failure strategies, performance model, and recall/precision trade-offs).
+   - Provide 20 realistic interview panel questions and technical defenses.
+
+============================================================
+PROMPT 018
+============================================================
+Date: 2026-08-25
+
+Prompt:
+Create the Production Engineering Roadmap & Future Development Strategy:
+1. Create docs/ENGINEERING_ROADMAP.md:
+   - Document the v1.0.0 release as a deliberately scoped correctness baseline.
+   - Define architectural triggers, limitations, requirements-driven evolution, and priority levels (P0 to P3).
+   - Cover 5 core pillars: Retrieval Quality (semantic vector search, multilingual models), Evaluation & Reliability, Scale & Performance (persistent indexing, GPU acceleration), Product Capabilities (REST API, Web UI), and Enterprise Readiness.
+   - Include configuration reference, tuning guide, decision matrix, and engineering restraint ("What We Would NOT Build Yet").
+   - Provide an interview panel defense section detailing architectural choices.
+2. README.md Integration:
+   - Update README.md with an Engineering Roadmap section linking to docs/ENGINEERING_ROADMAP.md.
+
+============================================================
+PROMPT 019
+============================================================
+Date: 2026-08-25
+
+Prompt:
+Incorporate the visual hierarchy architecture diagram into docs/ENGINEERING_ROADMAP.md:
+- Update Section 3 of docs/ENGINEERING_ROADMAP.md with a top-level Mermaid flowchart depicting the v1.0.0 Baseline (Correctness, Evaluation, Core, ASR + OCR Retrieval) alongside the Evolution Roadmap (Quality, Scale, Product).
+- Ensure all Mermaid diagrams are clean, valid, and GitHub-renderable.
+- Run unit test suite and verify git status.
+
