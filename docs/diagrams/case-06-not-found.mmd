@@ -1,0 +1,33 @@
+flowchart TD
+    QUERY["Query: 'Batman'"]
+
+    subgraph ASR_BRANCH["Audio Evidence Path (ASR)"]
+        WHISPER["faster-whisper ASR"]
+        ASR_LOW["ASR Segment Score = 0.3500\n(< 0.50 threshold)\nASR Candidate REJECTED"]
+        WHISPER --> ASR_LOW
+    end
+
+    subgraph GLOBAL_VISUAL["Global Visual Discovery Path"]
+        SCOUT["Visual Scout (1 FPS) + Periodic Triggers (0.5 FPS)\n(13 coarse trigger windows)"]
+        PRE_FILTER["Coarse Text Pre-Filter\n(13 text-bearing windows)"]
+        DENSE["Dense Sampling @ 3.0 FPS\n(75 dense frames)"]
+        TRACK["IoU Text Tracking\n(10 tracked text events)"]
+        OCR_EVAL["Selective OCR Evaluation\n(55 OCR calls)"]
+        OCR_DISCOVERED["OCR Discovered Text Cards:\n- 'KINGOFMINDSET' (sim = 0.1263)\n- 'BUT IT'S NOT' (sim = 0.2118)\n- 'WAIT' (sim = 0.2400)\n- 'AT LEAST TELL ME YOUR NAME' (sim = 0.1655)"]
+        
+        SCOUT --> PRE_FILTER --> DENSE --> TRACK --> OCR_EVAL --> OCR_DISCOVERED
+    end
+
+    subgraph SIMILARITY_CHECK["Relevance Threshold Evaluation"]
+        REJECT_ALL["All OCR Similarity Scores <= 0.2400\n(< 0.45 ocr_min_threshold)\nVisual Candidate REJECTED"]
+        OCR_DISCOVERED --> REJECT_ALL
+    end
+
+    subgraph FINAL_OUTPUT["Pipeline Response Contract"]
+        NOT_FOUND_RES["status = 'NOT_FOUND'\nresults = []\ntotal_candidates = 0"]
+        ASR_LOW --> NOT_FOUND_RES
+        REJECT_ALL --> NOT_FOUND_RES
+    end
+
+    QUERY --> ASR_BRANCH
+    QUERY --> GLOBAL_VISUAL

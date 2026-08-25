@@ -1,0 +1,37 @@
+flowchart TD
+    QUERY["Query: 'Thank you for watching'"]
+
+    subgraph ASR_BRANCH["Audio Evidence Path (ASR)"]
+        WHISPER["faster-whisper ASR"]
+        ASR_REJECT["ASR Segment Score = 0.3932\n(< 0.50 candidate threshold)\nASR Candidate REJECTED"]
+        WHISPER --> ASR_REJECT
+    end
+
+    subgraph GLOBAL_VISUAL["Global Visual Discovery Path"]
+        FALLBACK["ASR Absent/Weak -> Fallback to Global Visual Scout"]
+        SCOUT["Visual Scout (1 FPS) + Periodic Triggers (0.5 FPS)\n(61 merged trigger windows)"]
+        PRE_FILTER["Coarse Text Pre-Filter\n(6 text-bearing windows identified)"]
+        DENSE_SAMPLING["Dense Temporal Sampling @ 3.0 FPS\n(36 actual dense frames)"]
+        TRACKING["Multi-Box IoU Tracking (threshold=0.5)\n(11 tracked text events)"]
+        OCR_EVAL["Selective OCR Evaluation\n(99 OCR calls across representative frames)"]
+        MATCH_FOUND["OCR Match: 'THANK YOU FOR WATCHING'\n(query_similarity = 1.0000, ocr_conf = 0.8868)"]
+
+        FALLBACK --> SCOUT --> PRE_FILTER --> DENSE_SAMPLING --> TRACKING --> OCR_EVAL --> MATCH_FOUND
+    end
+
+    subgraph ASSOCIATION["Candidate Association & Fusion"]
+        ASSOC["associate_and_fuse_candidates()"]
+        VIS_CAND["Visual-Only Candidate\n(sources = ['ocr'], speech_match = false, visual_text_match = true)"]
+        ASR_REJECT --> ASSOC
+        MATCH_FOUND --> ASSOC
+        ASSOC --> VIS_CAND
+    end
+
+    subgraph EVIDENCE_SELECTION["Modality-Aware Evidence Selection"]
+        SELECT_VIS["Select Visual Track Best Frame Timestamp\n(timestamp = 111.500s, frame #3345)"]
+        EXPORT_JPG["Export Evidence Image: evidence_111.500s.jpg"]
+        VIS_CAND --> SELECT_VIS --> EXPORT_JPG
+    end
+
+    QUERY --> ASR_BRANCH
+    QUERY --> GLOBAL_VISUAL

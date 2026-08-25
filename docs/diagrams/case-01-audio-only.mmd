@@ -1,0 +1,34 @@
+flowchart TD
+    QUERY["Query: 'Why Do We Fall?'"]
+    
+    subgraph ASR_BRANCH["Audio Evidence Path (ASR)"]
+        WHISPER["faster-whisper ASR (base model)"]
+        WORD_SPAN["find_query_span(): Extract exact word timestamps\n(query_start = 87.660s, query_end = 89.200s)"]
+        ASR_SCORE["ASR Match Score = 0.8173\n(70% Phrase Ratio + 30% Token Coverage)"]
+        ASR_CAND["ASR Candidate (speech_match = true)"]
+        WHISPER --> WORD_SPAN --> ASR_SCORE --> ASR_CAND
+    end
+
+    subgraph TARGETED_VISUAL["Targeted Visual Discovery Path"]
+        WIN_BOUNDS["Targeted Search Window: [86.160s, 92.700s]"]
+        VIS_DISCOVERY["Dense Sampling (3.0 FPS) & Text Detection"]
+        NO_VIS_MATCH["No Visual Text Matched Query in Window\n(visual_text_match = false)"]
+        WIN_BOUNDS --> VIS_DISCOVERY --> NO_VIS_MATCH
+    end
+
+    subgraph ASSOCIATION["Candidate Association & Fusion"]
+        ASSOC["associate_and_fuse_candidates()\nTemporal Overlap Check"]
+        SPOKEN_CAND["ASR-Only Candidate\n(sources = ['asr'], fused_score = 0.8173)"]
+        ASR_CAND --> ASSOC
+        NO_VIS_MATCH --> ASSOC
+        ASSOC --> SPOKEN_CAND
+    end
+
+    subgraph EVIDENCE_SELECTION["Modality-Aware Evidence Selection"]
+        ASR_EVIDENCE["Select ASR Query Span Timestamp\n(timestamp = 87.660s, frame #2630)"]
+        EXPORT_JPG["Export Evidence Image: evidence_87.660s.jpg"]
+        SPOKEN_CAND --> ASR_EVIDENCE --> EXPORT_JPG
+    end
+
+    QUERY --> ASR_BRANCH
+    ASR_CAND -->|Guides search bounds| TARGETED_VISUAL
