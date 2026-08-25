@@ -1,0 +1,63 @@
+# Development Configuration for Video Dialogue Locator (fast iteration with tiny Whisper)
+
+asr:
+  model: "tiny"
+  language: null
+  device: "cpu"
+  compute_type: "int8"
+  window_padding: 5.0
+  candidate_threshold: 0.60
+  partial_weight: 0.70
+  coverage_weight: 0.30
+
+sampling:
+  coarse_fps: 1.0
+  dense_fps: 2.0
+
+visual_scout:
+  enabled: true
+  method: "frame_diff"
+  threshold: 30
+  sample_fps: 1.0
+  periodic_detection_fps: 0.5
+  trigger_merge_window: 2.0
+
+text_detector:
+  enabled: true
+  min_confidence: 0.30
+
+tracking:
+  iou_threshold: 0.5
+  max_gap_seconds: 0.5
+
+matching:
+  character_weight: 0.60
+  token_weight: 0.40
+  similarity_threshold: 0.75
+  high_match_threshold: 0.85
+
+scoring:
+  weights:
+    asr: 0.30
+    ocr: 0.50
+    semantic: 0.20
+  missing_modality_handling: true
+
+ocr:
+  lang: "en"
+  min_confidence: 0.30
+
+semantic:
+  enabled: false
+  model: "all-MiniLM-L6-v2"
+  threshold: 0.60
+
+output:
+  top_k: 3
+  dedup_window: 2.0
+  save_image: true
+  image_format: "jpg"
+
+acquisition:
+  max_duration: 7200
+  max_file_size: 4000000000

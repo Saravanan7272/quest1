@@ -1,0 +1,69 @@
+============================================================
+PROMPT 001
+============================================================
+Tool: Google Antigravity / DeepMind AI Coding Assistant
+Date: 2026-08-25
+Purpose: Architecture Specification & Master Implementation Guidance
+
+Prompt:
+Master Implementation + Submission Instruction defining Query-Guided Temporal Search architecture:
+- Acquisition via yt-dlp & FFprobe
+- Temporal localization via faster-whisper ASR with combined partial phrase ratio (0.70) and token coverage (0.30)
+- Configurable search window padding (5.0s) and coarse 1 FPS frame sampling
+- Visual verification using PaddleOCR / RapidOCR with box-level character similarity (0.60) and token coverage (0.40)
+- Mandatory Phase 0 Environment Gate (hardware inspection, .venv validation, FFmpeg check, isolated model smoke tests)
+- Professional documentation (README.md, APPROACH.md, prompts.txt, evaluation metrics)
+
+Impact:
+Established the initial end-to-end architecture, strict environment validation gate, phaser roadmap, and defensible baseline design for the video dialogue locator project.
+
+============================================================
+PROMPT 002
+============================================================
+Tool: User Prompt Iteration
+Date: 2026-08-25
+Purpose: E2E Pipeline Real Video Verification with Short Sample
+
+Prompt:
+"can please use this url this is same but a short video we will go for this first lets go:
+https://youtu.be/dPTKl5H5ftg"
+
+Impact:
+Switched initial E2E pipeline verification target URL to short YouTube video sample (`https://youtu.be/dPTKl5H5ftg`) for fast visual evidence verification and temporal search alignment.
+
+============================================================
+PROMPT 003
+============================================================
+Tool: Engineering Handoff & Architecture Evolution Specification
+Date: 2026-08-25
+Purpose: Dual-Path Production-Oriented Architecture Upgrade
+
+Prompt:
+Project History & Engineering Handoff Document expanding system to production-oriented dual discovery architecture:
+- Data models (`ModalityScores`, `TrackedBox`, `TextEvent`, `Candidate`, `SearchStats` in `src/models.py`)
+- Visual Discovery Path (Visual Change Scout 1 FPS + Periodic Detector 0.5 FPS -> Trigger Merge 2s -> Dense Sampling 10 FPS -> Text Detection -> IoU Text Tracking)
+- Candidate Association & Missing-Modality Score Fusion (`src/scoring.py`)
+- Top-K deduplicated multi-candidate result contract
+- Updated tests and documentation (`README.md`, `APPROACH.md`, `experiments/`)
+
+Impact:
+Upgraded system from single ASR-dependent MVP to full dual-path production architecture capable of locating silent visual text cards, spoken audio dialogue, and multimodal occurrences with IoU tracking and score fusion.
+
+============================================================
+PROMPT 004
+============================================================
+Tool: Architectural Corrections & Test Matrix Expansion
+Date: 2026-08-25
+Purpose: Precision Refinements & Test Expansion
+
+Prompt:
+User corrections to architecture plan:
+- Strict PaddleOCR 3.x API separation: dedicated TextDetection for detection-only stage, full OCR pipeline for recognition
+- Dual-path retrieval terminology (audio evidence + visual evidence)
+- Explicit sampling limitation disclosure for short-lived text (<1.0s)
+- 3 mandatory tests: static scene text (periodic detector check), simultaneous multi-box tracking, text disappearance/reappearance
+- Comprehensive unit test suite expansion across all 9 test modules
+
+Impact:
+Applied strict boundary encapsulation for PaddleOCR 3.x detection vs recognition, refined dual-path retrieval terminology, added 3 critical tracker/detector unit tests, and expanded testing suite.
+============================================================

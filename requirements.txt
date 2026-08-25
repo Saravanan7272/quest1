@@ -1,0 +1,9 @@
+yt-dlp
+faster-whisper
+paddlepaddle
+paddleocr
+rapidfuzz
+numpy
+opencv-python
+PyYAML
+pytest

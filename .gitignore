@@ -1,0 +1,32 @@
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+
+# Python Bytecode & Caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Media and model caches
+.tmp/
+*.mp4
+*.mkv
+*.webm
+*.avi
+*.wav
+*.mp3
+*.flac
+
+# Outputs & Evidence (preserve directory structure)
+outputs/*
+!outputs/.gitkeep
+
+# Reports & local IDE configurations
+environment_report.txt
+.vscode/
+.idea/
+*.swp

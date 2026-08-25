@@ -1,0 +1,24 @@
+# Final evaluation configuration
+asr:
+  model: "base"
+  device: "cpu"
+  compute_type: "int8"
+  language: null
+  window_padding: 5.0
+  candidate_threshold: 0.60
+  partial_weight: 0.70
+  coverage_weight: 0.30
+
+sampling:
+  coarse_fps: 1.0
+
+matching:
+  character_weight: 0.60
+  token_weight: 0.40
+  similarity_threshold: 0.75
+  high_match_threshold: 0.85
+
+ocr:
+  lang: "en"
+  device: "cpu"
+  min_confidence: 0.30
