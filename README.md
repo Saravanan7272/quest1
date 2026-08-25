@@ -139,15 +139,83 @@ The automated test suite contains **36 unit tests** covering all modules:
 .\.venv\Scripts\pytest.exe tests/
 ```
 
-### Golden Benchmark Evaluation
-| Case | Query | Ground Truth | Speech Match | Visual Text Match | Sources | Status | Evidence Timestamp |
-|:---:|---|---|:---:|:---:|:---:|:---:|:---:|
-| **Case 1** | `"Why Do We Fall?"` | Spoken Only | True | False | `["asr"]` | `FOUND` | `1.50s` |
-| **Case 3** | `"Thank you for watching"` | Silent Visual Text | False | True | `["ocr"]` | `FOUND` | `111.50s` |
-| **Case 5** | `"At least tell me your name"` | Spoken + Visual | True | True | `["asr", "ocr"]` | `FOUND` | `15.18s` / `15.35s` |
-| **Case 6** | `"Batman"` | Neither | False | False | `[]` | `NOT_FOUND` | None |
+### Golden Benchmark Evaluation Suite
 
-For execution details and full matrix specifications, see [docs/TESTING.md](docs/TESTING.md).
+The evaluation benchmark contains **7 Golden Test Cases** covering spoken dialogue, silent visual text, multimodal confirmation, and negative controls.
+
+#### Golden Test Benchmark Summary Matrix
+
+| Case | Video Link | Target Query | Ground Truth | Speech Match | Visual Text Match | Sources | Status | Expected Evidence Timestamp |
+|:---:|---|---|---|:---:|:---:|:---:|:---:|:---:|
+| **Case 1** | [YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0) | `"Why Do We Fall?"` | Spoken Only | True | False | `["asr"]` | `FOUND` | `1.50s` (ASR Query Span) |
+| **Case 2** | [YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0) | `"so that we can learn to pick ourselves"` | Spoken Only | True | False | `["asr"]` | `FOUND` | `9.90s` (ASR Query Span) |
+| **Case 3** | [YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0) | `"Thank you for watching"` | **Silent Visual Text** | False | True | `["ocr"]` | `FOUND` | `111.50s` (Visual OCR Frame) |
+| **Case 4** | [YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0) | `"have you quite given up on me?"` | Spoken Only | True | False | `["asr"]` | `FOUND` | `18.00s` (ASR Query Span) |
+| **Case 5** | [WZORRHNP9_w](https://www.youtube.com/shorts/WZORRHNP9_w) | `"At least tell me your name"` | **Spoken + Visual** | True | True | `["asr", "ocr"]` | `FOUND` | `15.18s` / `15.35s` (Visual OCR Frame) |
+| **Case 6** | [WZORRHNP9_w](https://www.youtube.com/shorts/WZORRHNP9_w) | `"Batman"` | Neither | False | False | `[]` | `NOT_FOUND` | None |
+| **Case 7** | [WZORRHNP9_w](https://www.youtube.com/shorts/WZORRHNP9_w) | `"The blue elephant is dancing"` | Neither | False | False | `[]` | `NOT_FOUND` | None |
+
+---
+
+### 📋 Detailed Test Case Execution Reference
+
+#### **Case 1**: Spoken Dialogue Query — `"Why Do We Fall?"`
+- **Video Source**: [https://www.youtube.com/watch?v=YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0)
+- **Modality**: Spoken Only (`speech_match = true`, `visual_text_match = false`)
+- **Execution Command**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 1
+  ```
+
+#### **Case 2**: Spoken Dialogue Query — `"so that we can learn to pick ourselves"`
+- **Video Source**: [https://www.youtube.com/watch?v=YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0)
+- **Modality**: Spoken Only (`speech_match = true`, `visual_text_match = false`)
+- **Execution Command**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 2
+  ```
+
+#### **Case 3**: Silent Visual Text Query — `"Thank you for watching"` (Visual-Only Path)
+- **Video Source**: [https://www.youtube.com/watch?v=YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0)
+- **Modality**: Silent Visual Text (`speech_match = false`, `visual_text_match = true`)
+- **Execution Command**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 3
+  ```
+
+#### **Case 4**: Spoken Dialogue Query — `"have you quite given up on me?"`
+- **Video Source**: [https://www.youtube.com/watch?v=YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0)
+- **Modality**: Spoken Only (`speech_match = true`, `visual_text_match = false`)
+- **Execution Command**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 4
+  ```
+
+#### **Case 5**: Multimodal Query — `"At least tell me your name"` (Spoken + Visual text)
+- **Video Source**: [https://www.youtube.com/shorts/WZORRHNP9_w](https://www.youtube.com/shorts/WZORRHNP9_w)
+- **Modality**: Spoken + Visual (`speech_match = true`, `visual_text_match = true`)
+- **Execution Command**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 5
+  ```
+
+#### **Case 6**: Negative Control Query — `"Batman"` (Expected: `NOT_FOUND`)
+- **Video Source**: [https://www.youtube.com/shorts/WZORRHNP9_w](https://www.youtube.com/shorts/WZORRHNP9_w)
+- **Modality**: Neither (`speech_match = false`, `visual_text_match = false`)
+- **Execution Command**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 6
+  ```
+
+#### **Case 7**: Unrelated Negative Control Query — `"The blue elephant is dancing"` (Expected: `NOT_FOUND`)
+- **Video Source**: [https://www.youtube.com/shorts/WZORRHNP9_w](https://www.youtube.com/shorts/WZORRHNP9_w)
+- **Modality**: Neither (`speech_match = false`, `visual_text_match = false`)
+- **Execution Command**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 7
+  ```
+
+For full evaluation matrix specifications and result schemas, see [docs/TESTING.md](docs/TESTING.md).
 
 ---
 

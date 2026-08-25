@@ -34,26 +34,53 @@ The test suite contains **36 unit tests** across 11 test modules:
 
 The system is benchmarked against a 7-query Golden Benchmark Matrix defined in `tests/fixtures/golden_tests.yaml`:
 
-| Case | Video URL | Target Query | Ground Truth | Speech Match | Visual Text Match | Sources | Expected Status | Evidence Timestamp |
+| Case | Video Link | Target Query | Ground Truth | Speech Match | Visual Text Match | Sources | Expected Status | Evidence Timestamp |
 |:---:|---|---|---|:---:|:---:|:---:|:---:|:---:|
-| **Case 1** | `YVvD7SZ7kc0` | `"Why Do We Fall?"` | Spoken Only | True | False | `["asr"]` | `FOUND` | `1.50s` (ASR Query Span) |
-| **Case 2** | `YVvD7SZ7kc0` | `"so that we can learn to pick ourselves"` | Spoken Only | True | False | `["asr"]` | `FOUND` | `9.90s` (ASR Query Span) |
-| **Case 3** | `YVvD7SZ7kc0` | `"Thank you for watching"` | **Silent Visual Text** | False | True | `["ocr"]` | `FOUND` | `111.50s` (Visual OCR Frame) |
-| **Case 4** | `YVvD7SZ7kc0` | `"have you quite given up on me?"` | Spoken Only | True | False | `["asr"]` | `FOUND` | `18.00s` (ASR Query Span) |
-| **Case 5** | `WZORRHNP9_w` | `"At least tell me your name"` | **Spoken + Visual** | True | True | `["asr", "ocr"]` | `FOUND` | `15.18s` / `15.35s` (Visual OCR Frame) |
-| **Case 6** | `WZORRHNP9_w` | `"Batman"` | Neither | False | False | `[]` | `NOT_FOUND` | None |
-| **Case 7** | `WZORRHNP9_w` | `"The blue elephant is dancing"` | Neither | False | False | `[]` | `NOT_FOUND` | None |
+| **Case 1** | [YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0) | `"Why Do We Fall?"` | Spoken Only | True | False | `["asr"]` | `FOUND` | `1.50s` (ASR Query Span) |
+| **Case 2** | [YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0) | `"so that we can learn to pick ourselves"` | Spoken Only | True | False | `["asr"]` | `FOUND` | `9.90s` (ASR Query Span) |
+| **Case 3** | [YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0) | `"Thank you for watching"` | **Silent Visual Text** | False | True | `["ocr"]` | `FOUND` | `111.50s` (Visual OCR Frame) |
+| **Case 4** | [YVvD7SZ7kc0](https://www.youtube.com/watch?v=YVvD7SZ7kc0) | `"have you quite given up on me?"` | Spoken Only | True | False | `["asr"]` | `FOUND` | `18.00s` (ASR Query Span) |
+| **Case 5** | [WZORRHNP9_w](https://www.youtube.com/shorts/WZORRHNP9_w) | `"At least tell me your name"` | **Spoken + Visual** | True | True | `["asr", "ocr"]` | `FOUND` | `15.18s` / `15.35s` (Visual OCR Frame) |
+| **Case 6** | [WZORRHNP9_w](https://www.youtube.com/shorts/WZORRHNP9_w) | `"Batman"` | Neither | False | False | `[]` | `NOT_FOUND` | None |
+| **Case 7** | [WZORRHNP9_w](https://www.youtube.com/shorts/WZORRHNP9_w) | `"The blue elephant is dancing"` | Neither | False | False | `[]` | `NOT_FOUND` | None |
 
 ---
 
 ## 🚀 Running Golden Cases
 
-To run an individual golden test case:
-```powershell
-.\.venv\Scripts\python.exe scripts/execute_single_case.py 5
-```
-
-To run the complete golden evaluation suite:
+### Run Complete Suite:
 ```powershell
 .\.venv\Scripts\python.exe scripts/execute_golden_suite.py
 ```
+
+### Run Individual Golden Cases:
+
+- **Case 1**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 1
+  ```
+- **Case 2**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 2
+  ```
+- **Case 3**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 3
+  ```
+- **Case 4**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 4
+  ```
+- **Case 5**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 5
+  ```
+- **Case 6**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 6
+  ```
+- **Case 7**:
+  ```powershell
+  .\.venv\Scripts\python.exe scripts/execute_single_case.py 7
+  ```
+
