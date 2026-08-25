@@ -12,13 +12,13 @@
     "status": "FOUND",
     "results": [
       {
-        "timestamp": "00:01:32.740",
-        "timestamp_seconds": 92.74,
-        "frame_number": 2782,
+        "timestamp": "00:01:33.760",
+        "timestamp_seconds": 93.76,
+        "frame_number": 2813,
         "extracted_text": "so that we can learn to pick ourselves",
         "match_strength": 1.0,
         "match_level": "HIGH",
-        "image_path": "outputs/evidence_92.740s.jpg",
+        "image_path": "outputs/runtime/evidence_93.760s.jpg",
         "sources": [
           "asr"
         ],
@@ -35,17 +35,17 @@
     ],
     "total_candidates": 1,
     "search_summary": {
-      "scout_frames": 122,
-      "detector_frames": 25,
-      "ocr_calls": 35,
+      "scout_frames": 11,
+      "detector_frames": 6,
+      "ocr_calls": 0,
       "candidates_found": 1,
-      "tracked_events": 22,
-      "runtime_seconds": 207.67
+      "tracked_events": 0,
+      "runtime_seconds": 31.44
     }
   },
-  "evidence_image_path": "tests/evaluation_results/evidence/case_02/so_that_we_can_learn_to_pick_o_001.jpg",
+  "evidence_image_path": "outputs/evaluation/case_02/so_that_we_can_learn_to_pick_o_001.jpg",
   "evaluation": {
     "passed": true,
-    "reason": "Status matched expected 'FOUND'"
+    "reason": "Status matched 'FOUND'"
   }
 }

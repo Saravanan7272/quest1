@@ -150,7 +150,13 @@ Run the 36 unit tests across 11 modules:
 .\.venv\Scripts\pytest.exe tests/
 ```
 
-### 3. Run Single Golden Case
+### 3. Canonical Benchmark Suite Runner
+Run all 7 Golden Test Cases and generate complete evaluation artifacts:
+```powershell
+.\.venv\Scripts\python.exe scripts/run_golden_suite.py
+```
+
+### 4. Run Single Golden Case
 ```powershell
 .\.venv\Scripts\python.exe scripts/execute_single_case.py 5
 ```

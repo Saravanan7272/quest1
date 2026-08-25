@@ -12,13 +12,13 @@
     "status": "FOUND",
     "results": [
       {
-        "timestamp": "00:01:27.660",
-        "timestamp_seconds": 87.66,
-        "frame_number": 2630,
+        "timestamp": "00:01:32.620",
+        "timestamp_seconds": 92.62,
+        "frame_number": 2779,
         "extracted_text": "Why Do We Fall?",
         "match_strength": 0.8173,
         "match_level": "MEDIUM",
-        "image_path": "outputs/runtime/evidence_87.660s.jpg",
+        "image_path": "outputs/runtime/evidence_92.620s.jpg",
         "sources": [
           "asr"
         ],
@@ -35,17 +35,17 @@
     ],
     "total_candidates": 1,
     "search_summary": {
-      "scout_frames": 122,
-      "detector_frames": 61,
-      "ocr_calls": 33,
+      "scout_frames": 6,
+      "detector_frames": 3,
+      "ocr_calls": 0,
       "candidates_found": 1,
-      "tracked_events": 15,
-      "runtime_seconds": 373.89
+      "tracked_events": 0,
+      "runtime_seconds": 25.34
     }
   },
   "evidence_image_path": "outputs/evaluation/case_01/why_do_we_fall__001.jpg",
   "evaluation": {
     "passed": true,
-    "reason": "Status matched expected 'FOUND'"
+    "reason": "Status matched 'FOUND'"
   }
 }
