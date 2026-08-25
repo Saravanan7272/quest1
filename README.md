@@ -1,12 +1,22 @@
-# Dual-Path Video Dialogue Locator (v1.0.0 Baseline)
+# Dual-Path Video Dialogue Locator (v1.0.0)
 
-A production-oriented, multi-modal video search system that locates dialogue occurrences in video content from either **spoken audio** or **burned-in visual text** (on-screen subtitles, title cards, dynamic captions).
+A production-grade, multi-modal video search system that locates dialogue occurrences in video content from either **spoken audio** or **burned-in visual text** (on-screen subtitles, title cards, dynamic captions), returning exact match timestamps and visual evidence frames.
 
 ---
 
-## 🌟 Architectural Overview
+## 🌟 Executive Overview
 
-The system uses a **Dual-Path Retrieval Architecture** with ASR-guided targeted visual discovery:
+Video Dialogue Locator combines Automatic Speech Recognition (ASR) with Computer Vision and Optical Character Recognition (OCR) into a **Dual-Path Retrieval Architecture**.
+
+### Supported Modality Modes:
+1. **Multimodal Match (ASR + OCR)**: Dialogue occurs in spoken speech **and** appears as on-screen text (e.g. Case 5). Returns `sources = ["asr", "ocr"]` and exports the visual OCR frame as evidence.
+2. **Visual-Only Match (OCR-Only)**: Dialogue appears as silent visual text or dynamic title card without spoken audio (e.g. Case 3). Returns `sources = ["ocr"]` and exports the visual OCR frame as evidence.
+3. **Spoken-Only Match (ASR-Only)**: Dialogue is spoken aloud without on-screen text (e.g. Case 1). Returns `sources = ["asr"]` and exports the frame corresponding to the spoken query span.
+4. **Negative Case (`NOT_FOUND`)**: Neither speech nor on-screen text matches the query (e.g. Case 6). Returns `status = "NOT_FOUND"`, `results = []`.
+
+---
+
+## 🏗️ High-Level Architecture
 
 ```text
                                   TARGET QUERY
@@ -15,7 +25,7 @@ The system uses a **Dual-Path Retrieval Architecture** with ASR-guided targeted 
                       │                                 │
                       ▼                                 ▼
              AUDIO EVIDENCE (ASR)              VISUAL DISCOVERY PATH
-           (faster-whisper word span)            (Scout + Dense Detector)
+           (faster-whisper word span)         (Scout + Staged Filter)
                       │                                 │
                       ▼                                 ▼
               ASR Query Span                      Visual Tracks
@@ -35,76 +45,161 @@ The system uses a **Dual-Path Retrieval Architecture** with ASR-guided targeted 
                      (Visual OCR Frame for Multimodal/OCR)
 ```
 
-### Key Subsystems
-1. **Audio Evidence Path**: Uses `faster-whisper` (word-level timestamps) to extract exact query word spans (`asr_query_start`, `asr_query_end`).
-2. **Targeted Visual Discovery Path**:
-   - **ASR-Guided Search Window**: When ASR candidate is present, restricts visual search to `[asr_query_start - pre_roll, asr_query_end + post_roll]`.
-   - **Global Visual Scout Fallback**: When ASR candidate is absent/weak (e.g. Case 3 silent visual text), falls back to global scout (1 FPS) + text-bearing trigger filtering.
-   - **Text-Bearing Trigger Filter**: Filters out non-text scenes before running dense text detection.
-   - **Dense Text Detection & IoU Tracking**: Detects text boxes at 3.0 FPS and tracks bounding boxes across consecutive frames using IoU tracking.
-   - **Representative Track Sampling**: Samples representative frames across each track's duration and evaluates OCR text similarity to select the highest-scoring frame (`best_frame_timestamp`).
-3. **Multi-Metric Candidate Association & Fusion**:
-   - Compares visual track bounds against ASR estimated query spans using temporal proximity tolerance (`5.0s`) AND multi-factor OCR similarity.
-   - Preserves explicit `speech_match` (bool) and `visual_text_match` (bool) flags, with `sources = ["asr"]`, `["ocr"]`, or `["asr", "ocr"]`.
-4. **Modality-Correct Evidence Frame Selection**:
-   - **Multimodal (ASR + OCR)**: Selects the visual OCR frame (e.g. 15.18s text card).
-   - **OCR-only**: Selects the visual OCR frame (e.g. 111.50s title card).
-   - **ASR-only**: Selects representative frame from ASR query span.
+For detailed architectural diagrams and stage breakdown, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
-## 🚀 Quick Start
+## ⚡ Staged Visual Reduction Strategy
 
-### 1. Prerequisites & Environment Setup
-- **Operating System**: Windows / Linux / macOS
-- **Python**: 3.10+
-- **System Dependencies**: FFmpeg installed and available on PATH.
+To avoid executing expensive CPU text detection on thousands of video frames, the visual discovery path applies a 5-stage reduction policy:
 
+```text
+121.31-second video (~3,630 frames)
+        │
+        ▼
+61 coarse / periodic trigger windows (1 FPS scout + 0.5 FPS periodic)
+        │
+        ▼
+Coarse Text-Bearing Window Filter (TextDetector pre-filter)
+        │
+        ▼
+6 text-bearing windows
+        │
+        ▼
+Dense Sampling at 3.0 FPS (36 actual dense frames)
+        │
+        ▼
+Text Detection & Multi-Box IoU Tracking (iou_threshold=0.5, max_gap=0.5s)
+        │
+        ▼
+11 tracked text events
+        │
+        ▼
+Representative Frame Sampling & Selective OCR Recognition
+        │
+        ▼
+Exact Match: "THANK YOU FOR WATCHING" (query_similarity = 1.0000)
+        │
+        ▼
+Exact Evidence Frame: 111.500s (frame #3345)
+```
+
+---
+
+## 📁 Source Code Map
+
+| File Path | Component | Responsibility |
+|---|---|---|
+| [src/pipeline.py](src/pipeline.py) | Orchestrator | Main entry point (`locate_dialogue_in_video`) coordinating acquisition, ASR, visual discovery, association, and JSON formatting. |
+| [src/asr.py](src/asr.py) | Audio Evidence | Transcribes audio with `faster-whisper` and extracts word-level query spans (`find_query_span`). |
+| [src/visual_pipeline.py](src/visual_pipeline.py) | Visual Discovery | Orchestrates change scouting, text-bearing filtering, dense sampling, tracking, and representative frame OCR. |
+| [src/candidate_association.py](src/candidate_association.py) | Fusion & Association | `associate_and_fuse_candidates`: Merges ASR query spans with visual tracks using temporal windowing (`5.0s`) and OCR thresholds (`0.45`). |
+| [src/text_detector.py](src/text_detector.py) | Text Detection | Uses RapidOCR ONNX model to extract text bounding boxes from frames. |
+| [src/text_tracker.py](src/text_tracker.py) | IoU Tracker | Tracks text bounding boxes across consecutive frames using IoU tracking. |
+| [src/ocr.py](src/ocr.py) | OCR Recognition | Evaluates text recognition on candidate frame crops using RapidOCR. |
+| [src/matching.py](src/matching.py) | Text Matching | Fuzzy phrase ratio and token coverage similarity for ASR and OCR text. |
+| [src/scoring.py](src/scoring.py) | Score Fusion | Score normalization and missing-modality score fusion (`fuse_scores`). |
+| [src/acquisition.py](src/acquisition.py) | Video Download | Downloads video via `yt-dlp` and inspects OpenCV video metadata. |
+| [src/models.py](src/models.py) | Data Models | Central dataclasses (`Candidate`, `ASRQuerySpan`, `VisualTrackSpan`, `EvidenceMetadata`, `SearchStats`). |
+| [run.py](run.py) | CLI Entry Point | Command-line interface for running dialogue queries. |
+
+---
+
+## ⚙️ Configuration Reference
+
+| Parameter Key | `config.yaml` Value | `config.dev.yaml` Value | Description |
+|---|---|---|---|
+| `asr.model` | `"base"` | `"tiny"` | Whisper model size (`"base"` for production, `"tiny"` for fast dev). |
+| `asr.candidate_threshold` | `0.50` | `0.50` | Minimum similarity score required to accept ASR candidate. |
+| `sampling.coarse_fps` | `1.0` | `1.0` | FPS for coarse change scout sampling. |
+| `sampling.dense_fps` | `3.0` | `2.0` | FPS for dense text detection sampling within text-bearing windows. |
+| `visual_scout.periodic_detection_fps` | `0.5` | `0.2` | Safety interval (FPS) for periodic text triggers. |
+| `visual_scout.trigger_merge_window` | `2.0` | `3.0` | Window (seconds) for merging adjacent scout triggers into clips. |
+| `matching.ocr_min_threshold` | `0.45` | `0.45` | Minimum OCR similarity required for candidate association. |
+| `matching.similarity_threshold` | `0.75` | `0.75` | Threshold for candidate score filtering. |
+
+For the complete parameter specification table, see [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
+
+---
+
+## 🧪 Automated Testing & Benchmark Evaluation
+
+### Unit Test Suite
+The automated test suite contains **36 unit tests** covering all modules:
+```powershell
+.\.venv\Scripts\pytest.exe tests/
+```
+
+### Golden Benchmark Evaluation
+| Case | Query | Ground Truth | Speech Match | Visual Text Match | Sources | Status | Evidence Timestamp |
+|:---:|---|---|:---:|:---:|:---:|:---:|:---:|
+| **Case 1** | `"Why Do We Fall?"` | Spoken Only | True | False | `["asr"]` | `FOUND` | `1.50s` |
+| **Case 3** | `"Thank you for watching"` | Silent Visual Text | False | True | `["ocr"]` | `FOUND` | `111.50s` |
+| **Case 5** | `"At least tell me your name"` | Spoken + Visual | True | True | `["asr", "ocr"]` | `FOUND` | `15.18s` / `15.35s` |
+| **Case 6** | `"Batman"` | Neither | False | False | `[]` | `NOT_FOUND` | None |
+
+For execution details and full matrix specifications, see [docs/TESTING.md](docs/TESTING.md).
+
+---
+
+## 📊 Result JSON Schema Contract
+
+```json
+{
+  "status": "FOUND",
+  "results": [
+    {
+      "timestamp": "00:00:15.347",
+      "timestamp_seconds": 15.347,
+      "frame_number": 460,
+      "extracted_text": "ATLEASTTELL MEYOUR NAME",
+      "match_strength": 0.7499,
+      "match_level": "HIGH",
+      "image_path": "outputs/evidence_15.347s.jpg",
+      "sources": ["asr", "ocr"],
+      "evidence": {
+        "speech_match": true,
+        "visual_text_match": true
+      },
+      "scores": {
+        "asr": 0.95,
+        "ocr": 0.6299,
+        "semantic": null
+      }
+    }
+  ],
+  "total_candidates": 1
+}
+```
+
+For schema details and modality payload examples, see [docs/OUTPUT_SCHEMA.md](docs/OUTPUT_SCHEMA.md).
+
+---
+
+## 🚀 Quick Start & CLI Reference
+
+### 1. Installation
 ```bash
-# Create and activate virtual environment
 python -m venv .venv
-# On Windows:
-.venv\Scripts\activate
-
-# Install dependencies
+.\.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Run Dialogue Locator CLI
+### 2. Run CLI Query
 ```bash
 python run.py --url https://www.youtube.com/shorts/WZORRHNP9_w --target "At least tell me your name" --config config.yaml
 ```
 
----
-
-## 🧪 Comprehensive Unit Testing
-
-Run the automated test suite covering models, word-level ASR span extraction, sampling, visual scout, text detector, IoU tracker, scoring, multi-metric candidate association, signature consistency, and evidence selection:
-
+### 3. Run Single Golden Case
 ```bash
-pytest tests/
+python scripts/execute_single_case.py 5
 ```
 
-*36 passing unit tests verified.*
-
 ---
 
-## 🏆 Golden Evaluation Test Suite
+## 🛠️ Release Information
 
-The system is evaluated against the Golden Benchmark Matrix:
-
-| Case | Video URL | Query | Ground Truth | Speech Match | Visual Text Match | Sources | Expected Result |
-|:---:|---|---|---|:---:|:---:|:---:|:---:|
-| **Case 1** | `YVvD7SZ7kc0` | `"Why Do We Fall?"` | Spoken Only | True | False | `["asr"]` | `FOUND` |
-| **Case 3** | `YVvD7SZ7kc0` | `"Thank you for watching"` | Silent Visual Text | False | True | `["ocr"]` | `FOUND` |
-| **Case 5** | `WZORRHNP9_w` | `"At least tell me your name"` | Spoken + Visual | True | True | `["asr", "ocr"]` | `FOUND` |
-| **Case 6** | `WZORRHNP9_w` | `"Batman"` | Neither | False | False | `[]` | `NOT_FOUND` |
-
----
-
-## 🤖 AI Disclosure & Transparency
-
-In compliance with technical assignment guidelines, all prompts, iterations, and model feedback used during development are fully documented in [`prompts.txt`](file:///e:/quest1/prompts.txt).## ⚠️ Architectural Scope & Limitations
-
-> [!NOTE]
-> This architecture covers the major retrieval scenarios while retaining explicit sampling limitations for extremely short-lived visual text (< 0.5s duration).
+- **Version**: `v1.0.0`
+- **Git Tag**: `v1.0.0`
+- **Git Commit**: `95a0111`
+- **Release Status**: Stable Correctness Baseline
