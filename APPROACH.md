@@ -57,5 +57,39 @@ The **Video Dialogue Locator** addresses the open-ended task of finding exact vi
 3. **Text Disappears and Reappears**:
    - *Risk*: Merging separate occurrences into a single continuous event.
    - *Mitigation*: Track closes automatically after `max_gap_seconds` ($0.5\text{s}$) inactivity.
-4. **Short-Lived Visual Text (< 0.5s)**:
-   - *Scope Limitation*: Short-lived single-frame text (< 0.5s) may be missed depending on sampling rate.
+## 5. Golden Evaluation Benchmark Matrix
+
+The system is evaluated against a 7-query Golden Benchmark Matrix covering spoken-only, silent visual text, multimodal confirmation, and negative controls:
+
+| Video URL | Query | Ground Truth | ASR | OCR | Expected Result | Expected Sources | Expected Evidence |
+|---|---|---|:---:|:---:|:---:|:---:|:---:|
+| `YVvD7SZ7kc0` | `"Why Do We Fall?"` | Speech | ✓ | — | `FOUND` | `["asr"]` | `speech_match: true` |
+| `YVvD7SZ7kc0` | `"so that we can learn to pick ourselves"` | Speech | ✓ | — | `FOUND` | `["asr"]` | `speech_match: true` |
+| `YVvD7SZ7kc0` | `"Thank you for watching"` | **Silent visual text** | ✗ | ✓ | `FOUND` | `["ocr"]` | `visual_text_match: true` |
+| `YVvD7SZ7kc0` | `"have you quite given up on me?"` | Speech | ✓ | — | `FOUND` | `["asr"]` | `speech_match: true` |
+| `WZORRHNP9_w` | `"At least tell me your name"` | **Speech + visual** | ✓ | ✓ | `FOUND` | `["asr", "ocr"]` | `speech_match: true`, `visual_text_match: true` |
+| `WZORRHNP9_w` | `"Batman"` | Neither | ✗ | ✗ | `NOT_FOUND` | `[]` | None |
+| `WZORRHNP9_w` | `"The blue elephant is dancing"` | Neither | ✗ | ✗ | `NOT_FOUND` | `[]` | None |
+
+*Detailed benchmark specifications are in [`tests/fixtures/README.md`](file:///e:/quest1/tests/fixtures/README.md).*
+
+```text
+                    VIDEO DIALOGUE LOCATOR
+                              │
+          ┌───────────────────┼───────────────────┐
+          │                   │                   │
+      SPOKEN ONLY        VISUAL ONLY       BOTH MODALITIES
+          │                   │                   │
+      ASR success          OCR success       ASR + OCR
+          │                   │                   │
+          └───────────────────┼───────────────────┘
+                              │
+                         NEGATIVE TEST
+                              │
+                         NOT_FOUND
+                              │
+                    SHORT-LIVED VISUAL
+                              │
+                    TEMPORAL RECALL
+```
+

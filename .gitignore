@@ -21,9 +21,13 @@ __pycache__/
 *.mp3
 *.flac
 
-# Outputs & Evidence (preserve directory structure)
-outputs/*
+# Outputs & Evidence
+outputs/runtime/
+outputs/tmp/
+outputs/debug_case_03/
+*.log
 !outputs/.gitkeep
+!outputs/evaluation/
 
 # Reports & local IDE configurations
 environment_report.txt

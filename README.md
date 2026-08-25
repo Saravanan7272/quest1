@@ -1,4 +1,4 @@
-# Dual-Path Video Dialogue Locator
+# Dual-Path Video Dialogue Locator (v1.0.0 Baseline)
 
 A production-oriented, multi-modal video search system that locates dialogue occurrences in video content from either **spoken audio** or **burned-in visual text** (on-screen subtitles, title cards, dynamic captions).
 
@@ -6,7 +6,7 @@ A production-oriented, multi-modal video search system that locates dialogue occ
 
 ## 🌟 Architectural Overview
 
-The system uses a **Dual-Path Retrieval Architecture** to ensure robust discovery across diverse video content:
+The system uses a **Dual-Path Retrieval Architecture** with ASR-guided targeted visual discovery:
 
 ```text
                                   TARGET QUERY
@@ -14,32 +14,42 @@ The system uses a **Dual-Path Retrieval Architecture** to ensure robust discover
                       ┌────────────────┴────────────────┐
                       │                                 │
                       ▼                                 ▼
-             AUDIO EVIDENCE                     VISUAL EVIDENCE
-          (faster-whisper ASR)           (Scout 1FPS + Periodic 0.5FPS)
+             AUDIO EVIDENCE (ASR)              VISUAL DISCOVERY PATH
+           (faster-whisper word span)            (Scout + Dense Detector)
+                      │                                 │
+                      ▼                                 ▼
+              ASR Query Span                      Visual Tracks
+           [asr_query_start, end]             [track_id, ocr_text, sim]
                       │                                 │
                       └────────────────┬────────────────┘
                                        ▼
-                         TEMPORAL CANDIDATE ASSOCIATION
-                                  (Window: 2.0s)
+                         MULTI-METRIC CANDIDATE ASSOCIATION
+                          (Temporal Window + OCR Score)
                                        │
                                        ▼
-                       MISSING-MODALITY SCORE FUSION
-                     (Normalized ASR + OCR + Semantic)
+                        MISSING-MODALITY SCORE FUSION
+                      (Normalized ASR + OCR + Semantic)
                                        │
                                        ▼
-                          TOP-K DEDUPLICATED CONTRACT
+                           EXACT EVIDENCE SELECTION
+                     (Visual OCR Frame for Multimodal/OCR)
 ```
 
 ### Key Subsystems
-1. **Audio Evidence Path**: Uses `faster-whisper` (word-level timestamps) to perform phrase-ratio (70%) and token-coverage (30%) fuzzy matching across transcribed speech segments.
-2. **Visual Discovery Path**:
-   - **Visual Change Scout (1 FPS)**: Computes frame differences to detect dynamic scene cuts and title appearances.
-   - **Periodic Text Detector (0.5 FPS)**: Guarantees recall insurance for silent text appearing on static backgrounds.
-   - **Trigger Merging (2s Window)**: Combines change scout and periodic triggers into continuous sampling windows.
-   - **Dense Sampling & Text Detection**: Samples triggered clips at higher FPS and extracts text bounding boxes.
-   - **Multi-Box IoU Tracking**: Tracks individual text regions across consecutive frames using bounding-box IoU, one-to-one assignment, and maximum gap tolerance (`0.5s`).
-   - **Query Relevance Frame Selection**: Identifies best evidence frame per track based on `ocr_confidence * text_similarity`.
-3. **Missing-Modality Score Fusion**: Fuses scores across available modalities using normalized weights ($\sum w_m = 1.0$), ensuring spoken dialogue without visual text (and vice-versa) is correctly identified.
+1. **Audio Evidence Path**: Uses `faster-whisper` (word-level timestamps) to extract exact query word spans (`asr_query_start`, `asr_query_end`).
+2. **Targeted Visual Discovery Path**:
+   - **ASR-Guided Search Window**: When ASR candidate is present, restricts visual search to `[asr_query_start - pre_roll, asr_query_end + post_roll]`.
+   - **Global Visual Scout Fallback**: When ASR candidate is absent/weak (e.g. Case 3 silent visual text), falls back to global scout (1 FPS) + text-bearing trigger filtering.
+   - **Text-Bearing Trigger Filter**: Filters out non-text scenes before running dense text detection.
+   - **Dense Text Detection & IoU Tracking**: Detects text boxes at 3.0 FPS and tracks bounding boxes across consecutive frames using IoU tracking.
+   - **Representative Track Sampling**: Samples representative frames across each track's duration and evaluates OCR text similarity to select the highest-scoring frame (`best_frame_timestamp`).
+3. **Multi-Metric Candidate Association & Fusion**:
+   - Compares visual track bounds against ASR estimated query spans using temporal proximity tolerance (`5.0s`) AND multi-factor OCR similarity.
+   - Preserves explicit `speech_match` (bool) and `visual_text_match` (bool) flags, with `sources = ["asr"]`, `["ocr"]`, or `["asr", "ocr"]`.
+4. **Modality-Correct Evidence Frame Selection**:
+   - **Multimodal (ASR + OCR)**: Selects the visual OCR frame (e.g. 15.18s text card).
+   - **OCR-only**: Selects the visual OCR frame (e.g. 111.50s title card).
+   - **ASR-only**: Selects representative frame from ASR query span.
 
 ---
 
@@ -48,7 +58,7 @@ The system uses a **Dual-Path Retrieval Architecture** to ensure robust discover
 ### 1. Prerequisites & Environment Setup
 - **Operating System**: Windows / Linux / macOS
 - **Python**: 3.10+
-- **System Dependencies**: FFmpeg and FFprobe installed and available on PATH.
+- **System Dependencies**: FFmpeg installed and available on PATH.
 
 ```bash
 # Create and activate virtual environment
@@ -60,80 +70,41 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### 2. Verify Environment Gate
-Run the Phase 0 environment check diagnostic script:
+### 2. Run Dialogue Locator CLI
 ```bash
-python scripts/check_environment.py
-```
-
-### 3. Run Dialogue Locator CLI
-```bash
-python run.py --url https://youtu.be/dPTKl5H5ftg --target "My mind rebels at stagnation" --config config.yaml
-```
-
----
-
-## 📊 Sample Output Contract
-
-```json
-{
-  "status": "FOUND",
-  "results": [
-    {
-      "timestamp": "00:00:00.000",
-      "timestamp_seconds": 0.0,
-      "frame_number": 0,
-      "extracted_text": "My mind rebels at stagnation",
-      "match_strength": 0.805,
-      "match_level": "MEDIUM",
-      "image_path": "outputs/evidence_0.000s.jpg",
-      "sources": [
-        "asr"
-      ],
-      "evidence": {
-        "speech_match": true,
-        "visual_text_match": false
-      },
-      "scores": {
-        "asr": 0.805,
-        "ocr": null,
-        "semantic": null
-      }
-    }
-  ],
-  "total_candidates": 1,
-  "search_summary": {
-    "scout_frames": 37,
-    "detector_frames": 19,
-    "ocr_calls": 18,
-    "candidates_found": 1,
-    "tracked_events": 0,
-    "runtime_seconds": 98.33
-  }
-}
+python run.py --url https://www.youtube.com/shorts/WZORRHNP9_w --target "At least tell me your name" --config config.yaml
 ```
 
 ---
 
 ## 🧪 Comprehensive Unit Testing
 
-Run the automated test suite covering models, matching, sampling, visual scout, text detector, IoU tracker, scoring, candidate association, and end-to-end pipeline:
+Run the automated test suite covering models, word-level ASR span extraction, sampling, visual scout, text detector, IoU tracker, scoring, multi-metric candidate association, signature consistency, and evidence selection:
 
 ```bash
 pytest tests/
 ```
 
-*32 passing unit tests verified.*
+*36 passing unit tests verified.*
+
+---
+
+## 🏆 Golden Evaluation Test Suite
+
+The system is evaluated against the Golden Benchmark Matrix:
+
+| Case | Video URL | Query | Ground Truth | Speech Match | Visual Text Match | Sources | Expected Result |
+|:---:|---|---|---|:---:|:---:|:---:|:---:|
+| **Case 1** | `YVvD7SZ7kc0` | `"Why Do We Fall?"` | Spoken Only | True | False | `["asr"]` | `FOUND` |
+| **Case 3** | `YVvD7SZ7kc0` | `"Thank you for watching"` | Silent Visual Text | False | True | `["ocr"]` | `FOUND` |
+| **Case 5** | `WZORRHNP9_w` | `"At least tell me your name"` | Spoken + Visual | True | True | `["asr", "ocr"]` | `FOUND` |
+| **Case 6** | `WZORRHNP9_w` | `"Batman"` | Neither | False | False | `[]` | `NOT_FOUND` |
 
 ---
 
 ## 🤖 AI Disclosure & Transparency
 
-In compliance with technical assignment guidelines, all prompts, iterations, and model feedback used during development are fully documented in [`prompts.txt`](file:///e:/quest1/prompts.txt).
-
----
-
-## ⚠️ Architectural Scope & Limitations
+In compliance with technical assignment guidelines, all prompts, iterations, and model feedback used during development are fully documented in [`prompts.txt`](file:///e:/quest1/prompts.txt).## ⚠️ Architectural Scope & Limitations
 
 > [!NOTE]
 > This architecture covers the major retrieval scenarios while retaining explicit sampling limitations for extremely short-lived visual text (< 0.5s duration).

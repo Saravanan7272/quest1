@@ -1,0 +1,51 @@
+{
+  "case_id": "case_01",
+  "case_name": "case_01_why_do_we_fall",
+  "video_url": "https://www.youtube.com/watch?v=YVvD7SZ7kc0",
+  "query": "Why Do We Fall?",
+  "ground_truth": "spoken_only",
+  "expected_status": "FOUND",
+  "expected_sources": [
+    "asr"
+  ],
+  "actual_result": {
+    "status": "FOUND",
+    "results": [
+      {
+        "timestamp": "00:01:27.660",
+        "timestamp_seconds": 87.66,
+        "frame_number": 2630,
+        "extracted_text": "Why Do We Fall?",
+        "match_strength": 0.8173,
+        "match_level": "MEDIUM",
+        "image_path": "outputs/runtime/evidence_87.660s.jpg",
+        "sources": [
+          "asr"
+        ],
+        "evidence": {
+          "speech_match": true,
+          "visual_text_match": false
+        },
+        "scores": {
+          "asr": 0.8173,
+          "ocr": null,
+          "semantic": null
+        }
+      }
+    ],
+    "total_candidates": 1,
+    "search_summary": {
+      "scout_frames": 122,
+      "detector_frames": 61,
+      "ocr_calls": 33,
+      "candidates_found": 1,
+      "tracked_events": 15,
+      "runtime_seconds": 373.89
+    }
+  },
+  "evidence_image_path": "outputs/evaluation/case_01/why_do_we_fall__001.jpg",
+  "evaluation": {
+    "passed": true,
+    "reason": "Status matched expected 'FOUND'"
+  }
+}

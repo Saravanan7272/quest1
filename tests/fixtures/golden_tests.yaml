@@ -1,0 +1,79 @@
+# Machine-Readable Golden Test Manifest
+# Video Dialogue Locator — Golden Evaluation Test Suite
+
+- id: "case_01"
+  name: "case_01_why_do_we_fall"
+  video_url: "https://www.youtube.com/watch?v=YVvD7SZ7kc0"
+  query: "Why Do We Fall?"
+  ground_truth: "spoken_only"
+  expected_status: "FOUND"
+  expected_sources: ["asr"]
+  expected_evidence:
+    speech_match: true
+    visual_text_match: false
+
+- id: "case_02"
+  name: "case_02_pick_ourselves"
+  video_url: "https://www.youtube.com/watch?v=YVvD7SZ7kc0"
+  query: "so that we can learn to pick ourselves"
+  ground_truth: "spoken_only"
+  expected_status: "FOUND"
+  expected_sources: ["asr"]
+  expected_evidence:
+    speech_match: true
+    visual_text_match: false
+
+- id: "case_03"
+  name: "case_03_thank_you_for_watching"
+  video_url: "https://www.youtube.com/watch?v=YVvD7SZ7kc0"
+  query: "Thank you for watching"
+  ground_truth: "visual_only"
+  expected_status: "FOUND"
+  expected_sources: ["ocr"]
+  expected_evidence:
+    speech_match: false
+    visual_text_match: true
+
+- id: "case_04"
+  name: "case_04_given_up_on_me"
+  video_url: "https://www.youtube.com/watch?v=YVvD7SZ7kc0"
+  query: "have you quite given up on me?"
+  ground_truth: "spoken_only"
+  expected_status: "FOUND"
+  expected_sources: ["asr"]
+  expected_evidence:
+    speech_match: true
+    visual_text_match: false
+
+- id: "case_05"
+  name: "case_05_at_least_tell_me_your_name"
+  video_url: "https://www.youtube.com/shorts/WZORRHNP9_w"
+  query: "At least tell me your name"
+  ground_truth: "spoken_and_visual"
+  expected_status: "FOUND"
+  expected_sources: ["asr", "ocr"]
+  expected_evidence:
+    speech_match: true
+    visual_text_match: true
+
+- id: "case_06"
+  name: "case_06_batman"
+  video_url: "https://www.youtube.com/shorts/WZORRHNP9_w"
+  query: "Batman"
+  ground_truth: "neither"
+  expected_status: "NOT_FOUND"
+  expected_sources: []
+  expected_evidence:
+    speech_match: false
+    visual_text_match: false
+
+- id: "case_07"
+  name: "case_07_blue_elephant"
+  video_url: "https://www.youtube.com/shorts/WZORRHNP9_w"
+  query: "The blue elephant is dancing"
+  ground_truth: "neither"
+  expected_status: "NOT_FOUND"
+  expected_sources: []
+  expected_evidence:
+    speech_match: false
+    visual_text_match: false

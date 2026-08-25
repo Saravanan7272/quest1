@@ -6,13 +6,13 @@ asr:
   device: "cpu"
   compute_type: "int8"
   window_padding: 5.0
-  candidate_threshold: 0.60
+  candidate_threshold: 0.50
   partial_weight: 0.70
   coverage_weight: 0.30
 
 sampling:
   coarse_fps: 1.0
-  dense_fps: 10.0
+  dense_fps: 3.0
 
 visual_scout:
   enabled: true

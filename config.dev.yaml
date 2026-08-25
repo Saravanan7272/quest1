@@ -19,8 +19,8 @@ visual_scout:
   method: "frame_diff"
   threshold: 30
   sample_fps: 1.0
-  periodic_detection_fps: 0.5
-  trigger_merge_window: 2.0
+  periodic_detection_fps: 0.2
+  trigger_merge_window: 3.0
 
 text_detector:
   enabled: true

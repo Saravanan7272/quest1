@@ -1,0 +1,51 @@
+{
+  "case_id": "case_03",
+  "case_name": "case_03_thank_you_for_watching",
+  "video_url": "https://www.youtube.com/watch?v=YVvD7SZ7kc0",
+  "query": "Thank you for watching",
+  "ground_truth": "visual_only",
+  "expected_status": "FOUND",
+  "expected_sources": [
+    "ocr"
+  ],
+  "actual_result": {
+    "status": "FOUND",
+    "results": [
+      {
+        "timestamp": "00:01:51.500",
+        "timestamp_seconds": 111.5,
+        "frame_number": 3345,
+        "extracted_text": "THANK YOU FOR WATCHING",
+        "match_strength": 1.0,
+        "match_level": "HIGH",
+        "image_path": "outputs/runtime/evidence_111.500s.jpg",
+        "sources": [
+          "ocr"
+        ],
+        "evidence": {
+          "speech_match": false,
+          "visual_text_match": true
+        },
+        "scores": {
+          "asr": null,
+          "ocr": 1.0,
+          "semantic": null
+        }
+      }
+    ],
+    "total_candidates": 1,
+    "search_summary": {
+      "scout_frames": 122,
+      "detector_frames": 61,
+      "ocr_calls": 99,
+      "candidates_found": 6,
+      "tracked_events": 11,
+      "runtime_seconds": 244.05
+    }
+  },
+  "evidence_image_path": "outputs/evaluation/case_03/thank_you_for_watching_001.jpg",
+  "evaluation": {
+    "passed": true,
+    "reason": "Status matched expected 'FOUND'"
+  }
+}

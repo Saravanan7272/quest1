@@ -1,0 +1,27 @@
+{
+  "case_id": "case_07",
+  "case_name": "case_07_blue_elephant",
+  "video_url": "https://www.youtube.com/shorts/WZORRHNP9_w",
+  "query": "The blue elephant is dancing",
+  "ground_truth": "neither",
+  "expected_status": "NOT_FOUND",
+  "expected_sources": [],
+  "actual_result": {
+    "status": "NOT_FOUND",
+    "results": [],
+    "total_candidates": 0,
+    "search_summary": {
+      "scout_frames": 25,
+      "detector_frames": 5,
+      "ocr_calls": 11,
+      "candidates_found": 0,
+      "tracked_events": 11,
+      "runtime_seconds": 60.87
+    }
+  },
+  "evidence_image_path": "",
+  "evaluation": {
+    "passed": true,
+    "reason": "Status matched expected 'NOT_FOUND'"
+  }
+}

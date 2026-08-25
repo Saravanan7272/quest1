@@ -31,6 +31,32 @@ class TextEvent:
     best_relevance: float = 0.0
 
 @dataclass
+class ASRQuerySpan:
+    segment_text: str = ""
+    segment_start: float = 0.0
+    segment_end: float = 0.0
+    query_start: float = 0.0
+    query_end: float = 0.0
+    score: float = 0.0
+
+@dataclass
+class VisualTrackSpan:
+    track_id: int = -1
+    start: float = 0.0
+    end: float = 0.0
+    best_frame_timestamp: float = 0.0
+    ocr_text: str = ""
+    ocr_confidence: float = 0.0
+    query_similarity: float = 0.0
+
+@dataclass
+class EvidenceMetadata:
+    timestamp_seconds: float = 0.0
+    frame_number: int = 0
+    image_path: str = ""
+    source: List[str] = field(default_factory=list)
+
+@dataclass
 class Candidate:
     timestamp: float
     frame_number: int
@@ -40,6 +66,12 @@ class Candidate:
     image_path: Optional[str] = None
     source: str = "unknown"          # "asr", "visual", "multimodal"
     fused_score: Optional[float] = None
+    speech_match: bool = False
+    visual_text_match: bool = False
+    sources: List[str] = field(default_factory=list)
+    asr_span: Optional[ASRQuerySpan] = None
+    visual_span: Optional[VisualTrackSpan] = None
+    evidence: Optional[EvidenceMetadata] = None
 
 @dataclass
 class SearchStats:
@@ -49,3 +81,4 @@ class SearchStats:
     candidates_found: int = 0        # candidates passing threshold
     tracked_events: int = 0          # distinct text events tracked
     runtime_seconds: float = 0.0
+    visual_search_truncated: bool = False

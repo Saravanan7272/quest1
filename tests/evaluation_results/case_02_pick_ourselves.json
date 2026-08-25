@@ -1,0 +1,51 @@
+{
+  "case_id": "case_02",
+  "case_name": "case_02_pick_ourselves",
+  "video_url": "https://www.youtube.com/watch?v=YVvD7SZ7kc0",
+  "query": "so that we can learn to pick ourselves",
+  "ground_truth": "spoken_only",
+  "expected_status": "FOUND",
+  "expected_sources": [
+    "asr"
+  ],
+  "actual_result": {
+    "status": "FOUND",
+    "results": [
+      {
+        "timestamp": "00:01:32.740",
+        "timestamp_seconds": 92.74,
+        "frame_number": 2782,
+        "extracted_text": "so that we can learn to pick ourselves",
+        "match_strength": 1.0,
+        "match_level": "HIGH",
+        "image_path": "outputs/evidence_92.740s.jpg",
+        "sources": [
+          "asr"
+        ],
+        "evidence": {
+          "speech_match": true,
+          "visual_text_match": false
+        },
+        "scores": {
+          "asr": 1.0,
+          "ocr": null,
+          "semantic": null
+        }
+      }
+    ],
+    "total_candidates": 1,
+    "search_summary": {
+      "scout_frames": 122,
+      "detector_frames": 25,
+      "ocr_calls": 35,
+      "candidates_found": 1,
+      "tracked_events": 22,
+      "runtime_seconds": 207.67
+    }
+  },
+  "evidence_image_path": "tests/evaluation_results/evidence/case_02/so_that_we_can_learn_to_pick_o_001.jpg",
+  "evaluation": {
+    "passed": true,
+    "reason": "Status matched expected 'FOUND'"
+  }
+}

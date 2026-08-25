@@ -1,0 +1,27 @@
+{
+  "case_id": "case_06",
+  "case_name": "case_06_batman",
+  "video_url": "https://www.youtube.com/shorts/WZORRHNP9_w",
+  "query": "Batman",
+  "ground_truth": "neither",
+  "expected_status": "NOT_FOUND",
+  "expected_sources": [],
+  "actual_result": {
+    "status": "NOT_FOUND",
+    "results": [],
+    "total_candidates": 0,
+    "search_summary": {
+      "scout_frames": 25,
+      "detector_frames": 13,
+      "ocr_calls": 55,
+      "candidates_found": 0,
+      "tracked_events": 10,
+      "runtime_seconds": 192.5
+    }
+  },
+  "evidence_image_path": "",
+  "evaluation": {
+    "passed": true,
+    "reason": "Status matched expected 'NOT_FOUND'"
+  }
+}

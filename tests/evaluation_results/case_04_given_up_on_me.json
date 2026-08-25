@@ -1,0 +1,29 @@
+{
+  "case_id": "case_04",
+  "case_name": "case_04_given_up_on_me",
+  "video_url": "https://www.youtube.com/watch?v=YVvD7SZ7kc0",
+  "query": "have you quite given up on me?",
+  "ground_truth": "spoken_only",
+  "expected_status": "FOUND",
+  "expected_sources": [
+    "asr"
+  ],
+  "actual_result": {
+    "status": "NOT_FOUND",
+    "results": [],
+    "total_candidates": 0,
+    "search_summary": {
+      "scout_frames": 122,
+      "detector_frames": 25,
+      "ocr_calls": 35,
+      "candidates_found": 0,
+      "tracked_events": 22,
+      "runtime_seconds": 441.87
+    }
+  },
+  "evidence_image_path": "",
+  "evaluation": {
+    "passed": false,
+    "reason": "Status mismatch: got 'NOT_FOUND', expected 'FOUND'"
+  }
+}

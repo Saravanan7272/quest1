@@ -1,0 +1,53 @@
+{
+  "case_id": "case_05",
+  "case_name": "case_05_at_least_tell_me_your_name",
+  "video_url": "https://www.youtube.com/shorts/WZORRHNP9_w",
+  "query": "At least tell me your name",
+  "ground_truth": "spoken_and_visual",
+  "expected_status": "FOUND",
+  "expected_sources": [
+    "asr",
+    "ocr"
+  ],
+  "actual_result": {
+    "status": "FOUND",
+    "results": [
+      {
+        "timestamp": "00:00:15.347",
+        "timestamp_seconds": 15.347,
+        "frame_number": 460,
+        "extracted_text": "ATLEASTTELL MEYOUR NAME",
+        "match_strength": 0.7499,
+        "match_level": "BELOW_THRESHOLD",
+        "image_path": "outputs/runtime/evidence_15.347s.jpg",
+        "sources": [
+          "asr",
+          "ocr"
+        ],
+        "evidence": {
+          "speech_match": true,
+          "visual_text_match": true
+        },
+        "scores": {
+          "asr": 0.95,
+          "ocr": 0.6299,
+          "semantic": null
+        }
+      }
+    ],
+    "total_candidates": 1,
+    "search_summary": {
+      "scout_frames": 7,
+      "detector_frames": 4,
+      "ocr_calls": 16,
+      "candidates_found": 2,
+      "tracked_events": 3,
+      "runtime_seconds": 60.79
+    }
+  },
+  "evidence_image_path": "outputs/evaluation/case_05/at_least_tell_me_your_name_001.jpg",
+  "evaluation": {
+    "passed": true,
+    "reason": "Status matched expected 'FOUND'"
+  }
+}
