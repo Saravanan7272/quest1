@@ -1,0 +1,17 @@
+flowchart TD
+    FULL["121.31s Total Video\n(~3,630 raw frames @ 30 FPS)"]
+    WINDOW_SCOUT["1 FPS Scout + 0.5 FPS Periodic Triggers\n(61 coarse trigger windows)"]
+    TEXT_FILTER["TextDetector Pre-Filter\n(6 text-bearing windows identified)"]
+    DENSE_SAMPLES["3.0 FPS Dense Sampling\n(36 actual dense frames)"]
+    TRACKING["Multi-Box IoU Tracking (threshold=0.5)\n(11 tracked text events)"]
+    OCR_EVAL["Selective OCR on Track Representative Frames"]
+    EXACT_MATCH["OCR Match: 'THANK YOU FOR WATCHING'\n(query_similarity = 1.0000)"]
+    FINAL_EVIDENCE["Visual Evidence Frame: 111.500s\n(frame #3345)"]
+
+    FULL -->|Coarse Scan| WINDOW_SCOUT
+    WINDOW_SCOUT -->|Text-bearing pre-filter| TEXT_FILTER
+    TEXT_FILTER -->|Targeted temporal sampling| DENSE_SAMPLES
+    DENSE_SAMPLES -->|Bounding box IoU linking| TRACKING
+    TRACKING -->|Best frame selection| OCR_EVAL
+    OCR_EVAL -->|Fuzzy string matching| EXACT_MATCH
+    EXACT_MATCH -->|Export JPG evidence| FINAL_EVIDENCE

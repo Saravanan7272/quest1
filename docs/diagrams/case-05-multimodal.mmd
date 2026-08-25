@@ -1,0 +1,33 @@
+flowchart TD
+    QUERY["Query: 'At least tell me your name'"]
+    
+    subgraph ASR_BRANCH["ASR Branch"]
+        WHISPER["faster-whisper ASR"]
+        WORD_SPAN["find_query_span(): 14.68s -> 15.68s"]
+        ASR_CAND["ASR Candidate (Score = 0.9500)"]
+        WHISPER --> WORD_SPAN --> ASR_CAND
+    end
+
+    subgraph TARGETED_VISUAL["Targeted Visual Discovery"]
+        SEARCH_WIN["Targeted Search Window\n[13.18s, 19.18s]"]
+        SCOUT_DENSE["Scout + Dense Sampling @ 3.0 FPS"]
+        TRACK_RECS["Track 1 & Track 2 (best_frame = 15.18s)"]
+        OCR_REC["RapidOCR: 'ATLEASTTELL MEYOUR NAME'\n(query_sim = 0.5500)"]
+        SEARCH_WIN --> SCOUT_DENSE --> TRACK_RECS --> OCR_REC
+    end
+
+    QUERY --> ASR_BRANCH
+    ASR_CAND -->|Guides search bounds| TARGETED_VISUAL
+
+    subgraph MULTIMODAL_FUSION["Candidate Association & Fusion"]
+        ASSOC["associate_and_fuse_candidates()\nTemporal Overlap <= 5.0s AND ocr_conf >= 0.45"]
+        MULTIMODAL["MULTIMODAL Candidate\n(sources = ['asr', 'ocr'], fused_score = 0.7499)"]
+        ASR_CAND --> ASSOC
+        OCR_REC --> ASSOC
+        ASSOC --> MULTIMODAL
+    end
+
+    subgraph EVIDENCE_SELECTION["Evidence Frame Selection"]
+        VIS_EVIDENCE["Select Visual OCR Frame\n(timestamp = 15.18s / 15.35s)"]
+        MULTIMODAL --> VIS_EVIDENCE
+    end

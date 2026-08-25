@@ -18,70 +18,79 @@ Video Dialogue Locator combines Automatic Speech Recognition (ASR) with Computer
 
 ## 🏗️ High-Level Architecture
 
-```text
-                                  TARGET QUERY
-                                       │
-                      ┌────────────────┴────────────────┐
-                      │                                 │
-                      ▼                                 ▼
-             AUDIO EVIDENCE (ASR)              VISUAL DISCOVERY PATH
-           (faster-whisper word span)         (Scout + Staged Filter)
-                      │                                 │
-                      ▼                                 ▼
-              ASR Query Span                      Visual Tracks
-           [asr_query_start, end]             [track_id, ocr_text, sim]
-                      │                                 │
-                      └────────────────┬────────────────┘
-                                       ▼
-                         MULTI-METRIC CANDIDATE ASSOCIATION
-                          (Temporal Window + OCR Score)
-                                       │
-                                       ▼
-                        MISSING-MODALITY SCORE FUSION
-                      (Normalized ASR + OCR + Semantic)
-                                       │
-                                       ▼
-                           EXACT EVIDENCE SELECTION
-                     (Visual OCR Frame for Multimodal/OCR)
+```mermaid
+flowchart TD
+    subgraph INPUT["Input Query & Media"]
+        U["User Query & Video URL"]
+        ACQ["Acquisition Module\n(src/acquisition.py)"]
+        U --> ACQ
+    end
+
+    subgraph DUAL_PATH["Dual-Path Retrieval Architecture"]
+        direction TB
+        subgraph AUDIO_PATH["Audio Evidence Path (ASR)"]
+            ASR_TRANS["faster-whisper ASR\n(src/asr.py)"]
+            WORD_SPAN["Word-Level Query Span\nfind_query_span()"]
+            ASR_TRANS --> WORD_SPAN
+            ASR_CAND["ASR Candidate\n(asr_query_start, end)"]
+            WORD_SPAN --> ASR_CAND
+        end
+
+        subgraph VISUAL_PATH["Visual Discovery Path"]
+            SCOUT["Visual Scout & Triggers\n(src/visual_scout.py)"]
+            PRE_FILTER["Text-Bearing Pre-Filter\n(src/text_detector.py)"]
+            DENSE_SAMPLING["Dense Sampling & IoU Tracking\n(src/text_tracker.py)"]
+            OCR_EVAL["Representative Track OCR\n(src/ocr.py)"]
+            SCOUT --> PRE_FILTER --> DENSE_SAMPLING --> OCR_EVAL
+            VIS_CAND["Visual Candidate\n(visual_span, ocr_text)"]
+            OCR_EVAL --> VIS_CAND
+        end
+
+        ACQ --> AUDIO_PATH
+        ACQ --> VISUAL_PATH
+    end
+
+    subgraph FUSION["Candidate Association & Fusion"]
+        ASSOC["Candidate Association\n(src/candidate_association.py)\nassociate_and_fuse_candidates()"]
+        FUSE["Missing-Modality Score Fusion\n(src/scoring.py)"]
+        ASR_CAND --> ASSOC
+        VIS_CAND --> ASSOC
+        ASSOC --> FUSE
+    end
+
+    subgraph OUTPUT["Evidence Selection & Output"]
+        EVIDENCE["Modality-Aware Evidence Selection\n(src/pipeline.py)"]
+        JSON_RES["JSON Contract &\nEvidence Image (jpg)"]
+        FUSE --> EVIDENCE --> JSON_RES
+    end
 ```
 
 For detailed architectural diagrams and stage breakdown, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
-## ⚡ Staged Visual Reduction Strategy
+## ⚡ Staged Visual Reduction Strategy (Search Funnel)
 
 To avoid executing expensive CPU text detection on thousands of video frames, the visual discovery path applies a 5-stage reduction policy:
 
-```text
-121.31-second video (~3,630 frames)
-        │
-        ▼
-61 coarse / periodic trigger windows (1 FPS scout + 0.5 FPS periodic)
-        │
-        ▼
-Coarse Text-Bearing Window Filter (TextDetector pre-filter)
-        │
-        ▼
-6 text-bearing windows
-        │
-        ▼
-Dense Sampling at 3.0 FPS (36 actual dense frames)
-        │
-        ▼
-Text Detection & Multi-Box IoU Tracking (iou_threshold=0.5, max_gap=0.5s)
-        │
-        ▼
-11 tracked text events
-        │
-        ▼
-Representative Frame Sampling & Selective OCR Recognition
-        │
-        ▼
-Exact Match: "THANK YOU FOR WATCHING" (query_similarity = 1.0000)
-        │
-        ▼
-Exact Evidence Frame: 111.500s (frame #3345)
+```mermaid
+flowchart TD
+    FULL["121.31s Total Video\n(~3,630 raw frames @ 30 FPS)"]
+    WINDOW_SCOUT["1 FPS Scout + 0.5 FPS Periodic Triggers\n(61 coarse trigger windows)"]
+    TEXT_FILTER["TextDetector Pre-Filter\n(6 text-bearing windows identified)"]
+    DENSE_SAMPLES["3.0 FPS Dense Sampling\n(36 actual dense frames)"]
+    TRACKING["Multi-Box IoU Tracking (threshold=0.5)\n(11 tracked text events)"]
+    OCR_EVAL["Selective OCR on Track Representative Frames"]
+    EXACT_MATCH["OCR Match: 'THANK YOU FOR WATCHING'\n(query_similarity = 1.0000)"]
+    FINAL_EVIDENCE["Visual Evidence Frame: 111.500s\n(frame #3345)"]
+
+    FULL -->|Coarse Scan| WINDOW_SCOUT
+    WINDOW_SCOUT -->|Text-bearing pre-filter| TEXT_FILTER
+    TEXT_FILTER -->|Targeted temporal sampling| DENSE_SAMPLES
+    DENSE_SAMPLES -->|Bounding box IoU linking| TRACKING
+    TRACKING -->|Best frame selection| OCR_EVAL
+    OCR_EVAL -->|Fuzzy string matching| EXACT_MATCH
+    EXACT_MATCH -->|Export JPG evidence| FINAL_EVIDENCE
 ```
 
 ---

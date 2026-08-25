@@ -1,0 +1,44 @@
+flowchart TD
+    subgraph INPUT["Input Query & Media"]
+        U["User Query & Video URL"]
+        ACQ["Acquisition Module\n(src/acquisition.py)"]
+        U --> ACQ
+    end
+
+    subgraph DUAL_PATH["Dual-Path Retrieval Architecture"]
+        direction TB
+        subgraph AUDIO_PATH["Audio Evidence Path (ASR)"]
+            ASR_TRANS["faster-whisper ASR\n(src/asr.py)"]
+            WORD_SPAN["Word-Level Query Span\nfind_query_span()"]
+            ASR_TRANS --> WORD_SPAN
+            ASR_CAND["ASR Candidate\n(asr_query_start, end)"]
+            WORD_SPAN --> ASR_CAND
+        end
+
+        subgraph VISUAL_PATH["Visual Discovery Path"]
+            SCOUT["Visual Scout & Triggers\n(src/visual_scout.py)"]
+            PRE_FILTER["Text-Bearing Pre-Filter\n(src/text_detector.py)"]
+            DENSE_SAMPLING["Dense Sampling & IoU Tracking\n(src/text_tracker.py)"]
+            OCR_EVAL["Representative Track OCR\n(src/ocr.py)"]
+            SCOUT --> PRE_FILTER --> DENSE_SAMPLING --> OCR_EVAL
+            VIS_CAND["Visual Candidate\n(visual_span, ocr_text)"]
+            OCR_EVAL --> VIS_CAND
+        end
+
+        ACQ --> AUDIO_PATH
+        ACQ --> VISUAL_PATH
+    end
+
+    subgraph FUSION["Candidate Association & Fusion"]
+        ASSOC["Candidate Association\n(src/candidate_association.py)\nassociate_and_fuse_candidates()"]
+        FUSE["Missing-Modality Score Fusion\n(src/scoring.py)"]
+        ASR_CAND --> ASSOC
+        VIS_CAND --> ASSOC
+        ASSOC --> FUSE
+    end
+
+    subgraph OUTPUT["Evidence Selection & Output"]
+        EVIDENCE["Modality-Aware Evidence Selection\n(src/pipeline.py)"]
+        JSON_RES["JSON Contract &\nEvidence Image (jpg)"]
+        FUSE --> EVIDENCE --> JSON_RES
+    end
