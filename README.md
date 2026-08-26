@@ -135,30 +135,89 @@ For execution instructions and full case details, see [docs/TESTING.md](docs/TES
 
 ---
 
-## 🚀 Quick Start & CLI Commands
+## 🚀 Quick Start & Environment Setup
 
-### 1. Installation
+### 1. Installation & Environment Setup
+Clone the repository and install all dependencies:
 ```bash
+# Clone the repository
+git clone https://github.com/Saravanan7272/quest1.git
+cd quest1
+
+# Create & activate Python virtual environment
+# On Linux/macOS:
+python3 -m venv .venv
+source .venv/bin/activate
+
+# On Windows PowerShell:
 python -m venv .venv
 .\.venv\Scripts\activate
+
+# Install required dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Automated Test Suite
-Run the 36 unit tests across 11 modules:
-```powershell
-.\.venv\Scripts\pytest.exe tests/
+### 2. Single Video Query Search (Evaluation CLI)
+Run the application on any arbitrary public video URL and target dialogue query:
+```bash
+# Linux / macOS:
+python run.py --url "https://www.youtube.com/watch?v=YVvD7SZ7kc0" --target "Why Do We Fall?"
+
+# Windows PowerShell:
+.\.venv\Scripts\python.exe run.py --url "https://www.youtube.com/watch?v=YVvD7SZ7kc0" --target "Why Do We Fall?"
 ```
 
-### 3. Canonical Benchmark Suite Runner
-Run all 7 Golden Test Cases and generate complete evaluation artifacts:
-```powershell
+#### Output Result Payload Contract:
+The CLI outputs formatted logs and prints the final JSON search result contract:
+```json
+{
+  "status": "FOUND",
+  "query": "Why Do We Fall?",
+  "video_url": "https://www.youtube.com/watch?v=YVvD7SZ7kc0",
+  "results": [
+    {
+      "candidate_id": "cand_01",
+      "sources": ["asr"],
+      "match_level": "EXACT_ASR",
+      "timestamp": "00:01:27.660",
+      "timestamp_seconds": 87.66,
+      "speech_match": true,
+      "visual_text_match": false,
+      "scores": {
+        "fused_score": 0.7023,
+        "asr": 0.7023,
+        "ocr": null,
+        "semantic": null
+      },
+      "evidence_image_path": "outputs/cand_01_frame.jpg"
+    }
+  ]
+}
+```
+
+### 3. Canonical Golden Benchmark Suite
+Execute all 7 Golden Test Cases end-to-end and generate complete evaluation artifacts:
+```bash
+# Linux / macOS:
+python scripts/run_golden_suite.py
+
+# Windows PowerShell:
 .\.venv\Scripts\python.exe scripts/run_golden_suite.py
 ```
 
-### 4. Run Single Golden Case
-```powershell
-.\.venv\Scripts\python.exe scripts/execute_single_case.py 5
+### 4. Automated Unit Test Suite
+Run the 36 unit tests across 11 modules:
+```bash
+# Linux / macOS:
+pytest tests/
+
+# Windows PowerShell:
+.\.venv\Scripts\pytest.exe tests/
+```
+
+### 5. Run Single Golden Case
+```bash
+python scripts/execute_single_case.py 5
 ```
 
 ---

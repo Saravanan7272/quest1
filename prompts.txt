@@ -337,3 +337,19 @@ Incorporate the visual hierarchy architecture diagram into docs/ENGINEERING_ROAD
 - Ensure all Mermaid diagrams are clean, valid, and GitHub-renderable.
 - Run unit test suite and verify git status.
 
+============================================================
+PROMPT 020
+============================================================
+Date: 2026-08-26
+
+Prompt:
+Update environment setup and single-query evaluation CLI instructions in README.md:
+1. Environment Setup & Installation:
+   - Provide fool-proof step-by-step instructions for git clone, virtual environment creation (`.venv`), activation (Linux/macOS vs Windows PowerShell), and `pip install -r requirements.txt`.
+2. Evaluation CLI Usage:
+   - Detail CLI execution using python run.py --url "<URL>" --target "<QUERY>" for arbitrary public video evaluation.
+   - Document the JSON result payload contract and evidence image export format.
+3. Verification Suites:
+   - Provide clear commands for python scripts/run_golden_suite.py and pytest tests/.
+
+
