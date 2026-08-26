@@ -55,8 +55,8 @@ def run_visual_discovery(
     dense_fps = sampling_cfg.get("dense_fps", 3.0)
 
     # Budget safeguards
-    max_dense_frames = sampling_cfg.get("max_dense_frames", 300)
-    max_ocr_tracks = visual_cfg.get("max_ocr_tracks", 20)
+    max_dense_frames = sampling_cfg.get("max_dense_frames", 500)
+    max_ocr_tracks = visual_cfg.get("max_ocr_tracks", 100)
 
     t_start_all = time.time()
 
@@ -177,8 +177,8 @@ def run_visual_discovery(
     t_track_start = time.time()
     tracked_events = tracker.finalize()
     if len(tracked_events) > max_ocr_tracks:
-        logger.warning(f"Visual Discovery: Track count ({len(tracked_events)}) exceeded limit ({max_ocr_tracks}). Truncating tracks.")
-        tracked_events = tracked_events[:max_ocr_tracks]
+        logger.warning(f"Visual Discovery: Track count ({len(tracked_events)}) exceeded limit ({max_ocr_tracks}). Prioritizing persistent tracks.")
+        tracked_events = sorted(tracked_events, key=lambda t: (t.end - t.start, len(t.boxes)), reverse=True)[:max_ocr_tracks]
         stats.visual_search_truncated = True
 
     stats.tracked_events = len(tracked_events)
@@ -227,14 +227,20 @@ def run_visual_discovery(
         for rec in cand_recs:
             stats.ocr_calls += 1
             ocr_boxes = ocr_engine.run_ocr(rec.path)
-            for box in ocr_boxes:
-                score = compute_ocr_score(box.text, target_text, character_weight=char_w, token_weight=tok_w)
+            
+            # Form candidate text options: full-frame combined text & individual box texts
+            full_frame_text = " ".join([b.text.strip() for b in ocr_boxes if b.text and b.text.strip()])
+            box_texts = [b.text.strip() for b in ocr_boxes if b.text and b.text.strip()]
+            text_candidates = ([full_frame_text] if full_frame_text else []) + box_texts
+
+            for text_cand in text_candidates:
+                score = compute_ocr_score(text_cand, target_text, character_weight=char_w, token_weight=tok_w)
                 if score > best_track_score:
                     best_track_score = score
-                    best_track_text = box.text
-                    best_track_conf = float(box.confidence)
+                    best_track_text = text_cand
+                    best_track_conf = float(ocr_boxes[0].confidence) if ocr_boxes else 0.80
                     best_rec_for_track = rec
-                    best_track_boxes = [box]
+                    best_track_boxes = ocr_boxes
 
         v_span = VisualTrackSpan(
             track_id=track.track_id,
