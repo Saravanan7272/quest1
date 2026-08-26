@@ -364,4 +364,23 @@ In real-world news video evaluation (e.g. WION News Report: *Nepal Floods: Massi
    - On-screen news banners are frequently split across multiple lines (e.g. Yellow Line 1: `"Bihar on alert due to flood threat"`, Black Line 2: `"from Nepal"`).
    - **Architectural Resolution**: OCR evaluation now concatenates spatial text boxes into `full_frame_text = " ".join([b.text for b in ocr_boxes])` alongside individual bounding boxes, achieving a `1.0000` exact match on multi-line title banners.
 
+---
+
+### 6. Animated / Kinetic Text Case Study: ASR-Guided Search & Progressive Accumulation
+
+In evaluation on real-world media containing animated/kinetic subtitles (*Batman: "You've given them everything"*, YouTube Shorts ID `gmFEsT8CLNI`, URL: `https://www.youtube.com/shorts/gmFEsT8CLNI`, Query: `"you've given them everything"`), two key architectural mechanisms were validated:
+
+1. **ASR-Guided Search Windowing**:
+   - Spoken audio ASR transcribes spoken dialogue at `[10.02s, 11.38s]`.
+   - The primary ASR candidate restricts visual discovery to targeted window `[8.52s, 14.88s]`.
+   - **Performance Impact**: Evaluates only 26 OCR calls in **56.77s total runtime** (instead of scanning the full video).
+
+2. **Kinetic Text Tracking & Representative Frame Selection**:
+   - Dynamic animated text builds progressively across consecutive frames:
+     - `11.35s` $\rightarrow$ `"YOU'VE GIVEN THEM EVERY"` (similarity = `0.8412`)
+     - `11.69s` $\rightarrow$ `"YOU'VE GIVEN THEM EVERYTHIN"` (similarity = `0.8891`)
+     - `12.02s` $\rightarrow$ `"YOU'VE GIVEN THEM EVERYTHING"` (similarity = `1.0000`)
+   - Representative track sampling evaluates OCR query similarity across all candidate frames in the track and dynamically isolates the exact frame `12.020s` (frame #721) where text completion reaches **1.0000 (100% exact match)**.
+
+
 

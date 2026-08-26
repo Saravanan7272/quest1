@@ -1,9 +1,6 @@
 ============================================================
-PROMPT 001
+Prompt: 001
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 We need to design and implement a Dual-Path Video Dialogue Locator system capable of locating dialogue occurrences in video content from either spoken audio or burned-in visual text. Please execute the following master implementation plan:
 
 1. System Infrastructure & Acquisition:
@@ -25,22 +22,16 @@ We need to design and implement a Dual-Path Video Dialogue Locator system capabl
    - Set up standard project structure with configuration files (config.yaml), CLI entry points (run.py), unit tests (tests/), and documentation (README.md, APPROACH.md, prompts.txt).
 
 ============================================================
-PROMPT 002
+Prompt: 002
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Can you please test the pipeline end-to-end on a short video sample first? Let's use this YouTube URL:
 https://youtu.be/dPTKl5H5ftg
 
 Please verify video acquisition, audio transcription, frame sampling, text detection, and candidate score calculation on this sample to ensure the core pipeline runs cleanly without runtime errors before we test longer clips.
 
 ============================================================
-PROMPT 003
+Prompt: 003
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Please expand the system architecture from a single ASR MVP into a production-oriented Dual-Path Retrieval Architecture with independent audio and visual discovery channels:
 
 1. Data Models & Schemas:
@@ -59,11 +50,8 @@ Please expand the system architecture from a single ASR MVP into a production-or
    - Implement top-K candidate deduplication returning structured JSON output contracts.
 
 ============================================================
-PROMPT 004
+Prompt: 004
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Please apply the following precision refinements and test suite expansions:
 
 1. Strict OCR Engine API Boundary Separation:
@@ -78,11 +66,8 @@ Please apply the following precision refinements and test suite expansions:
    - Expand unit test coverage across all test modules in tests/.
 
 ============================================================
-PROMPT 005
+Prompt: 005
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Do not declare the system fully verified until we perform deep root-cause debugging across the visual pipeline and timestamp propagation:
 
 1. Visual Discovery Diagnostics:
@@ -97,11 +82,8 @@ Do not declare the system fully verified until we perform deep root-cause debugg
    - Re-run test suite and E2E validation to confirm BOTH speech_match: true AND visual_text_match: true for multimodal clips.
 
 ============================================================
-PROMPT 006
+Prompt: 006
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Please freeze the Golden Evaluation Test Suite and document permanent evaluation benchmark specifications across README.md, APPROACH.md, and tests/fixtures/README.md:
 
 1. Test Media & Queries:
@@ -113,11 +95,8 @@ Please freeze the Golden Evaluation Test Suite and document permanent evaluation
    - Document temporal recall limitations for short-lived silent visual text (<0.5s duration).
 
 ============================================================
-PROMPT 007
+Prompt: 007
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Please execute the complete Golden Evaluation Test Suite end-to-end:
 
 1. Environment & Cleanup:
@@ -131,11 +110,8 @@ Please execute the complete Golden Evaluation Test Suite end-to-end:
    - Generate human-readable markdown report tests/evaluation_results/GOLDEN_TEST_REPORT.md containing environment metadata and full test matrix results.
 
 ============================================================
-PROMPT 008
+Prompt: 008
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Please update .gitignore and output directory structure to version-control golden evaluation evidence:
 
 1. Directory Restructuring:
@@ -147,11 +123,8 @@ Please update .gitignore and output directory structure to version-control golde
    - Verify Git tracking state using git check-ignore -v to confirm evidence images are tracked.
 
 ============================================================
-PROMPT 009
+Prompt: 009
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Please execute final golden suite verification and URL sanitization:
 
 1. Input URL Handling:
@@ -165,11 +138,8 @@ Please execute final golden suite verification and URL sanitization:
    - Publish GOLDEN_TEST_REPORT.md and commit benchmark evidence artifacts.
 
 ============================================================
-PROMPT 010
+Prompt: 010
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Halt test suite execution and instrument deep stage-by-stage observability for Case 3 ("Thank you for watching" on YVvD7SZ7kc0):
 
 1. Deep Stage Observability Logging:
@@ -185,11 +155,8 @@ Halt test suite execution and instrument deep stage-by-stage observability for C
    - Track stage profiling timers: scout_time, periodic_detection_time, trigger_merge_time, dense_sampling_time, text_detection_time, tracking_time, ocr_time, candidate_matching_time, and total_runtime.
 
 ============================================================
-PROMPT 011
+Prompt: 011
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 We need to redesign the video text/dialogue localization pipeline to solve temporal timestamp mismatches:
 
 1. Word-Level Timestamp ASR Query Span Extraction:
@@ -202,11 +169,8 @@ We need to redesign the video text/dialogue localization pipeline to solve tempo
    - When ASR candidate is weak or absent (e.g., Case 3 silent visual text), fall back to global visual scout (1.0 FPS) with coarse text-bearing trigger filtering.
 
 ============================================================
-PROMPT 012
+Prompt: 012
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 APPROVED WITH REQUIRED CHANGES. Please incorporate these three corrections before proceeding:
 
 1. Configurable OCR Acceptance Policy:
@@ -220,11 +184,8 @@ APPROVED WITH REQUIRED CHANGES. Please incorporate these three corrections befor
    - Remove stale duplicate inline function def associate_and_fuse_candidates from src/pipeline.py (lines 37–93) and import the canonical implementation from src.candidate_association.
 
 ============================================================
-PROMPT 013
+Prompt: 013
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 STOP architectural changes. Freeze current working behavior as v1.0 and perform complete repository cleanup:
 
 1. Codebase Cleanup:
@@ -238,11 +199,8 @@ STOP architectural changes. Freeze current working behavior as v1.0 and perform 
    - Create git commit and tag release v1.0.0.
 
 ============================================================
-PROMPT 014
+Prompt: 014
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Perform a strict technical documentation audit and rewrite README.md strictly derived from codebase authority:
 
 1. Repository Source Audit:
@@ -254,11 +212,8 @@ Perform a strict technical documentation audit and rewrite README.md strictly de
    - Ensure 100% relative repository links; do NOT use local file:/// scheme links or Windows absolute paths.
 
 ============================================================
-PROMPT 015
+Prompt: 015
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Integrate a professional Mermaid architecture diagram system into the documentation:
 
 1. System Architecture Diagram:
@@ -272,11 +227,8 @@ Integrate a professional Mermaid architecture diagram system into the documentat
    - Create standalone version-controlled .mmd diagram files under docs/diagrams/.
 
 ============================================================
-PROMPT 016
+Prompt: 016
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Add explicit reference sections, execution commands, and video links for ALL 7 Golden Test Cases:
 
 1. Benchmark Reference Sections:
@@ -294,11 +246,8 @@ Add explicit reference sections, execution commands, and video links for ALL 7 G
    - Feature python scripts/run_golden_suite.py as the single canonical benchmark suite runner.
 
 ============================================================
-PROMPT 017
+Prompt: 017
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Create a canonical benchmark command and preserve evidence artifacts:
 1. Canonical Benchmark Runner:
    - Ensure scripts/run_golden_suite.py executes all 7 Golden Test Cases end-to-end and outputs a clean summary table showing PASS/FAIL status for each case.
@@ -311,11 +260,8 @@ Create a canonical benchmark command and preserve evidence artifacts:
    - Provide 20 realistic interview panel questions and technical defenses.
 
 ============================================================
-PROMPT 018
+Prompt: 018
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Create the Production Engineering Roadmap & Future Development Strategy:
 1. Create docs/ENGINEERING_ROADMAP.md:
    - Document the v1.0.0 release as a deliberately scoped correctness baseline.
@@ -327,22 +273,16 @@ Create the Production Engineering Roadmap & Future Development Strategy:
    - Update README.md with an Engineering Roadmap section linking to docs/ENGINEERING_ROADMAP.md.
 
 ============================================================
-PROMPT 019
+Prompt: 019
 ============================================================
-Date: 2026-08-25
-
-Prompt:
 Incorporate the visual hierarchy architecture diagram into docs/ENGINEERING_ROADMAP.md:
 - Update Section 3 of docs/ENGINEERING_ROADMAP.md with a top-level Mermaid flowchart depicting the v1.0.0 Baseline (Correctness, Evaluation, Core, ASR + OCR Retrieval) alongside the Evolution Roadmap (Quality, Scale, Product).
 - Ensure all Mermaid diagrams are clean, valid, and GitHub-renderable.
 - Run unit test suite and verify git status.
 
 ============================================================
-PROMPT 020
+Prompt: 020
 ============================================================
-Date: 2026-08-26
-
-Prompt:
 Update environment setup, single-query evaluation CLI instructions, and logging engine:
 1. Environment Setup & Installation:
    - Provide fool-proof step-by-step instructions for git clone, virtual environment creation (`.venv`), activation (Linux/macOS vs Windows PowerShell), and `pip install -r requirements.txt`.
@@ -354,11 +294,8 @@ Update environment setup, single-query evaluation CLI instructions, and logging 
    - Detail CLI execution using python run.py --url "<URL>" --target "<QUERY>" for arbitrary public video evaluation.
 
 ============================================================
-PROMPT 021
+Prompt: 021
 ============================================================
-Date: 2026-08-26
-
-Prompt:
 Diagnose and resolve visual track truncation and multi-line headline banner recognition on news video:
 1. News Video Edge Case Analysis:
    - Target Video: "Nepal Floods: Massive Flash Flood Wipes Out Nepal-China Border - Hundreds Feared Dead | WION Original" (YouTube ID Q8nTYEUNXlA, 26/08/2026).
@@ -372,11 +309,8 @@ Diagnose and resolve visual track truncation and multi-line headline banner reco
    - Document case study in docs/ARCHITECTURE.md and update engineering strategy in docs/ENGINEERING_ROADMAP.md.
 
 ============================================================
-PROMPT 022
+Prompt: 022
 ============================================================
-Date: 2026-08-26
-
-Prompt:
 Implement dynamic frame downscaling performance optimization and refine terminal logging formatting:
 1. Dynamic Frame Downscaling Optimization:
    - Implement _load_scaled_image() helper in src/text_detector.py and src/ocr.py to resize high-resolution images (> 1024px) down to max dimension 1024px before passing to RapidOCR ONNX inference.
@@ -388,6 +322,16 @@ Implement dynamic frame downscaling performance optimization and refine terminal
 3. Verification:
    - Verify unit test suite (pytest tests/) and confirm clean CLI execution.
 
-
-
+============================================================
+Prompt: 023
+============================================================
+Document animated kinetic text evaluation case study and ASR-guided search window validation:
+1. Animated Kinetic Text Case Study:
+   - Target Video: "Batman: 'You've given them everything'" (YouTube Shorts URL: https://www.youtube.com/shorts/gmFEsT8CLNI).
+   - Target Query: "you've given them everything".
+   - Test Scenario: Video featuring kinetic/animated text subtitles appearing word-by-word on screen while spoken dialogue plays.
+   - Validation 1 (ASR-Guided Search Windowing): ASR transcribes spoken dialogue at [10.02s, 11.38s] and restricts visual discovery to targeted window [8.52s, 14.88s], reducing OCR calls to 26 and total runtime to 56.77s.
+   - Validation 2 (Kinetic Text Tracking): Multi-box IoU tracking tracks text building across frames (11.35s -> "YOU'VE GIVEN THEM EVERY", 11.69s -> "YOU'VE GIVEN THEM EVERYTHIN", 12.02s -> "YOU'VE GIVEN THEM EVERYTHING") and representative frame sampling isolates exact frame 12.020s with 1.0000 exact similarity score.
+2. Documentation:
+   - Document case study in docs/ARCHITECTURE.md and engineering roadmap.
 

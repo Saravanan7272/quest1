@@ -40,7 +40,7 @@
       "ocr_calls": 0,
       "candidates_found": 1,
       "tracked_events": 0,
-      "runtime_seconds": 31.44
+      "runtime_seconds": 28.36
     }
   },
   "evidence_image_path": "outputs/evaluation/case_02/so_that_we_can_learn_to_pick_o_001.jpg",

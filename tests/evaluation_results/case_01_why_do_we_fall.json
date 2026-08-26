@@ -40,7 +40,7 @@
       "ocr_calls": 0,
       "candidates_found": 1,
       "tracked_events": 0,
-      "runtime_seconds": 25.34
+      "runtime_seconds": 27.72
     }
   },
   "evidence_image_path": "outputs/evaluation/case_01/why_do_we_fall__001.jpg",
