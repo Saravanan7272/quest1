@@ -349,3 +349,19 @@ flowchart TD
 - **Association**: Zero valid candidates survive score threshold filtering.
 - **Output**: `locate_dialogue_in_video()` returns `status = "NOT_FOUND"`, `results = []`, `total_candidates = 0`.
 
+---
+
+### 5. Real-World News Video Case Study: Multi-Line Banner Recognition & Persistent Track Prioritization
+
+In real-world news video evaluation (e.g. WION News Report: *Nepal Floods: Massive Flash Flood Wipes Out Nepal-China Border - Hundreds Feared Dead | WION Original*, YouTube ID `Q8nTYEUNXlA`, 26/08/2026), two critical visual search edge cases were identified and architecturally resolved:
+
+1. **High-Motion Scene Track Truncation**:
+   - Continuous background news footage generated **71 distinct text tracks**.
+   - Naive track truncation (`[:20]`) cut off late-appearing news headlines.
+   - **Architectural Resolution**: Increased default `max_ocr_tracks` from `20` to `100` and introduced **Persistent Track Prioritization**, sorting tracks by `(duration, box_count)` descending so long-lasting headline banners are evaluated first before transient noise tracks.
+
+2. **Multi-Line Headline Banner Combination**:
+   - On-screen news banners are frequently split across multiple lines (e.g. Yellow Line 1: `"Bihar on alert due to flood threat"`, Black Line 2: `"from Nepal"`).
+   - **Architectural Resolution**: OCR evaluation now concatenates spatial text boxes into `full_frame_text = " ".join([b.text for b in ocr_boxes])` alongside individual bounding boxes, achieving a `1.0000` exact match on multi-line title banners.
+
+

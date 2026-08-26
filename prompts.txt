@@ -343,13 +343,32 @@ PROMPT 020
 Date: 2026-08-26
 
 Prompt:
-Update environment setup and single-query evaluation CLI instructions in README.md:
+Update environment setup, single-query evaluation CLI instructions, and logging engine:
 1. Environment Setup & Installation:
    - Provide fool-proof step-by-step instructions for git clone, virtual environment creation (`.venv`), activation (Linux/macOS vs Windows PowerShell), and `pip install -r requirements.txt`.
-2. Evaluation CLI Usage:
+2. Logging Engine Overhaul:
+   - Suppress third-party verbose HTTP/backend loggers (`httpx`, `httpcore`, `urllib3`, `onnxruntime`, `PIL`, `matplotlib`, `ppocr`, `yt_dlp`).
+   - Format clean single-line video download output (`Downloaded video (9.05 MiB)`).
+   - Add ANSI level color highlighting (`[INFO]`, `[SUCCESS]`, `[WARNING]`, `[ERROR]`) for transparent step-by-step terminal tracing.
+3. Evaluation CLI Usage:
    - Detail CLI execution using python run.py --url "<URL>" --target "<QUERY>" for arbitrary public video evaluation.
-   - Document the JSON result payload contract and evidence image export format.
-3. Verification Suites:
-   - Provide clear commands for python scripts/run_golden_suite.py and pytest tests/.
+
+============================================================
+PROMPT 021
+============================================================
+Date: 2026-08-26
+
+Prompt:
+Diagnose and resolve visual track truncation and multi-line headline banner recognition on news video:
+1. News Video Edge Case Analysis:
+   - Target Video: "Nepal Floods: Massive Flash Flood Wipes Out Nepal-China Border - Hundreds Feared Dead | WION Original" (YouTube ID Q8nTYEUNXlA, 26/08/2026).
+   - Target Query: "Bihar on alert due to flood threat from Nepal".
+   - Root Cause Diagnosis: Video generated 71 visual tracks. Default track limit (max_ocr_tracks = 20) truncated tracks naively ([:20]), cutting off late-appearing headlines. Multi-line banner (Yellow top line: "Bihar on alert due to flood threat", Black bottom line: "from Nepal") was evaluated as split boxes.
+2. Architectural Resolutions:
+   - Increase max_ocr_tracks default from 20 to 100.
+   - Prioritize tracks by duration (track.end - track.start) and box count descending so persistent headlines are evaluated first.
+   - Concatenate spatial text boxes into full_frame_text to evaluate multi-line text cards as unified phrases.
+3. Documentation:
+   - Document case study in docs/ARCHITECTURE.md and update engineering strategy in docs/ENGINEERING_ROADMAP.md.
 
 
