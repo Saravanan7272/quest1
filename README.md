@@ -2,6 +2,9 @@
 
 A **production-oriented multimodal video retrieval baseline** that locates dialogue occurrences in video content from either **spoken audio** or **burned-in visual text** (on-screen subtitles, title cards, dynamic captions), returning exact match timestamps and visual evidence frames.
 
+> 📖 **[Interactive Architecture Guide & Technical Notes (Notion)](https://lydian-beanie-003.notion.site/Dual-Path-Video-Dialogue-Locator-3c79c10737c080a4878fc8c3432a96c6)**  
+> Explore the interactive architecture diagrams, visual search reduction funnel, and technical design notes on Notion.
+
 ---
 
 ## 🌟 Executive Overview

@@ -2,6 +2,9 @@
 
 This document serves as the **authoritative deep technical architecture guide** for the **Video Dialogue Locator (v1.0.0 Baseline)**.
 
+> 📖 **[Interactive Architecture Guide & Technical Notes (Notion)](https://lydian-beanie-003.notion.site/Dual-Path-Video-Dialogue-Locator-3c79c10737c080a4878fc8c3432a96c6)**  
+> Explore interactive architecture diagrams, visual search reduction funnels, and technical design notes on Notion.
+
 ---
 
 ## 🏗️ High-Level Architectural Subsystems
