@@ -371,4 +371,23 @@ Diagnose and resolve visual track truncation and multi-line headline banner reco
 3. Documentation:
    - Document case study in docs/ARCHITECTURE.md and update engineering strategy in docs/ENGINEERING_ROADMAP.md.
 
+============================================================
+PROMPT 022
+============================================================
+Date: 2026-08-26
+
+Prompt:
+Implement dynamic frame downscaling performance optimization and refine terminal logging formatting:
+1. Dynamic Frame Downscaling Optimization:
+   - Implement _load_scaled_image() helper in src/text_detector.py and src/ocr.py to resize high-resolution images (> 1024px) down to max dimension 1024px before passing to RapidOCR ONNX inference.
+   - Scale detected bounding box coordinates back to original video frame dimensions to maintain 100% exact evidence frame extraction accuracy.
+   - Achieve 4x–6x CPU speedup (reducing detection time from ~1.6s/frame to ~0.25s/frame).
+2. Professional Log Formatting & Highlighting:
+   - Enhance ColoredFormatter in run.py with ANSI level colors ([INFO] cyan, [SUCCESS] bold green, [WARNING] yellow, [ERROR] red).
+   - Format stage dividers and diagnostic traces cleanly to prevent line wrapping clutter in terminal buffers without omitting any logs.
+3. Verification:
+   - Verify unit test suite (pytest tests/) and confirm clean CLI execution.
+
+
+
 
