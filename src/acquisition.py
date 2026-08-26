@@ -126,6 +126,20 @@ def download_video(url: str, output_dir: Path) -> VideoMetadata:
     output_dir.mkdir(parents=True, exist_ok=True)
     out_template = str(output_dir / "input_video.mp4")
     
+    import urllib.parse
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    headers = {
+        "User-Agent": user_agent,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5"
+    }
+    try:
+        parsed = urllib.parse.urlparse(url)
+        if parsed.scheme and parsed.netloc:
+            headers["Referer"] = f"{parsed.scheme}://{parsed.netloc}/"
+    except Exception:
+        pass
+
     ydl_opts = {
         "outtmpl": out_template,
         "format": "bestvideo+bestaudio/best",
@@ -135,7 +149,10 @@ def download_video(url: str, output_dir: Path) -> VideoMetadata:
         "quiet": True,
         "no_warnings": True,
         "noprogress": True,
-        "overwrites": True
+        "overwrites": True,
+        "nocheckcertificate": True,
+        "legacy_server_connect": True,
+        "http_headers": headers
     }
     
     logger.info(f"Acquiring video from: {url}")
@@ -151,6 +168,8 @@ def download_video(url: str, output_dir: Path) -> VideoMetadata:
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
+    except KeyboardInterrupt:
+        raise AcquisitionError("Video download cancelled by user (KeyboardInterrupt).")
     except Exception as e:
         logger.warning(f"Primary yt-dlp format failed: {e}. Retrying with fallback format...")
         ydl_opts_fallback = {
@@ -161,11 +180,16 @@ def download_video(url: str, output_dir: Path) -> VideoMetadata:
             "quiet": True,
             "no_warnings": True,
             "noprogress": True,
-            "overwrites": True
+            "overwrites": True,
+            "nocheckcertificate": True,
+            "legacy_server_connect": True,
+            "http_headers": headers
         }
         try:
             with yt_dlp.YoutubeDL(ydl_opts_fallback) as ydl_fb:
                 ydl_fb.download([url])
+        except KeyboardInterrupt:
+            raise AcquisitionError("Video download cancelled by user (KeyboardInterrupt).")
         except Exception as e2:
             raise AcquisitionError(f"yt-dlp download failed for URL '{url}': {e2}")
         

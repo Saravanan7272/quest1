@@ -95,12 +95,16 @@ def main():
     logging.info(f"Target Text: '{args.target}'")
     logging.info(f"Video URL:   '{args.url}'")
 
-    result = locate_dialogue_in_video(
-        url=args.url,
-        target_text=args.target,
-        config=config,
-        output_dir=Path("outputs")
-    )
+    try:
+        result = locate_dialogue_in_video(
+            url=args.url,
+            target_text=args.target,
+            config=config,
+            output_dir=Path("outputs")
+        )
+    except KeyboardInterrupt:
+        logging.info("\nExecution cancelled by user (Ctrl+C). Exiting cleanly.")
+        sys.exit(130)
 
     print("\n================ FINAL SEARCH RESULT ================")
     print(json.dumps(result, indent=2, ensure_ascii=False))
