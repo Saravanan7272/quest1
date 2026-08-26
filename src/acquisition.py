@@ -134,6 +134,7 @@ def download_video(url: str, output_dir: Path) -> VideoMetadata:
         "fragment_retries": 10,
         "quiet": True,
         "no_warnings": True,
+        "noprogress": True,
         "overwrites": True
     }
     
@@ -143,17 +144,15 @@ def download_video(url: str, output_dir: Path) -> VideoMetadata:
         target_file = output_dir / local_path.name
         shutil.copy2(local_path, target_file)
         metadata = get_video_metadata(target_file)
-        logger.info(
-            f"Local video acquired: Duration={metadata.duration:.2f}s, FPS={metadata.fps:.2f}, "
-            f"Resolution={metadata.width}x{metadata.height}, HasAudio={metadata.has_audio}"
-        )
+        file_size_mb = target_file.stat().st_size / (1024 * 1024)
+        logger.info(f"Local video acquired ({file_size_mb:.2f} MiB): Duration={metadata.duration:.2f}s, FPS={metadata.fps:.2f}, Resolution={metadata.width}x{metadata.height}")
         return metadata
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
     except Exception as e:
-        logger.warning(f"Primary yt-dlp format failed: {e}. Retrying with format 'b'...")
+        logger.warning(f"Primary yt-dlp format failed: {e}. Retrying with fallback format...")
         ydl_opts_fallback = {
             "outtmpl": out_template,
             "format": "b",
@@ -161,6 +160,7 @@ def download_video(url: str, output_dir: Path) -> VideoMetadata:
             "fragment_retries": 10,
             "quiet": True,
             "no_warnings": True,
+            "noprogress": True,
             "overwrites": True
         }
         try:
@@ -175,11 +175,12 @@ def download_video(url: str, output_dir: Path) -> VideoMetadata:
         raise AcquisitionError(f"No video file created in {output_dir} after download.")
         
     video_file = downloaded_files[0]
-    logger.info(f"Successfully downloaded video to: {video_file}")
+    file_size_mb = video_file.stat().st_size / (1024 * 1024)
+    logger.info(f"Downloaded video ({file_size_mb:.2f} MiB)")
     
     metadata = get_video_metadata(video_file)
     if not metadata.has_audio:
-        logger.warning(f"Media file {video_file} has no audio stream detected.")
+        logger.warning(f"Media file has no audio stream detected.")
 
     logger.info(
         f"Metadata: Duration={metadata.duration:.2f}s, FPS={metadata.fps:.2f}, "

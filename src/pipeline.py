@@ -75,6 +75,10 @@ def locate_dialogue_in_video(
     if not target_text or not target_text.strip():
         return {"status": "ERROR", "error": "Invalid or empty target text provided."}
 
+    # Suppress third-party verbose loggers
+    for lib in ["httpx", "httpcore", "urllib3", "onnxruntime", "PIL", "matplotlib", "ppocr", "yt_dlp"]:
+        logging.getLogger(lib).setLevel(logging.WARNING)
+
     asr_cfg = config.get("asr", {})
     sampling_cfg = config.get("sampling", {})
     matching_cfg = config.get("matching", {})
